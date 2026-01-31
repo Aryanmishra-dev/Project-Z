@@ -1,0 +1,11 @@
+{
+  "name": "project-0",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "echo \"Start script not implemented\""
+  }
+}
