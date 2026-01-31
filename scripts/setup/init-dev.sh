@@ -1,6 +1,26 @@
 #!/bin/bash
 
+
 set -e
+
+SKIP_DOCKER=false
+SKIP_OLLAMA=false
+
+# simple args parsing
+for arg in "$@"; do
+    case $arg in
+        --no-docker|--skip-docker)
+            SKIP_DOCKER=true
+            shift
+            ;;
+        --no-ollama|--skip-ollama)
+            SKIP_OLLAMA=true
+            shift
+            ;;
+        *)
+            ;;
+    esac
+done
 
 echo "🚀 Initializing Project-0 Development Environment..."
 
@@ -8,10 +28,16 @@ echo "🚀 Initializing Project-0 Development Environment..."
 echo "📋 Checking prerequisites..."
 command -v node >/dev/null 2>&1 || { echo "❌ Node.js not found. Please install Node.js 20+"; exit 1; }
 command -v pnpm >/dev/null 2>&1 || { echo "❌ pnpm not found. Installing..."; npm install -g pnpm; }
-command -v docker >/dev/null 2>&1 || { echo "❌ Docker not found. Please install Docker Desktop"; exit 1; }
-command -v ollama >/dev/null 2>&1 || { echo "❌ Ollama not found. Installing..."; brew install ollama; }
 
-echo "✅ All prerequisites installed"
+if [ "$SKIP_DOCKER" = false ]; then
+    command -v docker >/dev/null 2>&1 || { echo "❌ Docker not found. Please install Docker Desktop or run with --no-docker"; exit 1; }
+fi
+
+if [ "$SKIP_OLLAMA" = false ]; then
+    command -v ollama >/dev/null 2>&1 || { echo "❌ Ollama not found. Install manually or run with --no-ollama"; }
+fi
+
+echo "✅ Prerequisite checks complete"
 
 # Setup environment
 echo "📝 Setting up environment..."
@@ -29,12 +55,16 @@ echo "🪝 Setting up Git hooks..."
 pnpm prepare
 
 # Start Docker services
-echo "🐳 Starting Docker services..."
-docker-compose up -d
+if [ "$SKIP_DOCKER" = false ]; then
+    echo "🐳 Starting Docker services..."
+    docker-compose up -d
 
-# Wait for services
-echo "⏳ Waiting for services to be ready..."
-sleep 10
+    # Wait for services
+    echo "⏳ Waiting for services to be ready..."
+    sleep 10
+else
+    echo "⚠️  Skipping Docker startup (SKIP_DOCKER=true)"
+fi
 
 # Run database migrations
 echo "🗄️  Running database migrations..."
@@ -47,8 +77,16 @@ if [ "$NODE_ENV" != "production" ]; then
 fi
 
 # Pull Ollama model
-echo "🤖 Pulling Ollama model (this may take a while)..."
-ollama pull mistral:7b-instruct-q4_K_M
+if [ "$SKIP_OLLAMA" = false ]; then
+    echo "🤖 Pulling Ollama model (this may take a while)..."
+    if command -v ollama >/dev/null 2>&1; then
+        ollama pull mistral:7b-instruct-q4_K_M || echo "⚠️  Ollama pull failed or model already present"
+    else
+        echo "⚠️  Ollama not available; skipping model pull"
+    fi
+else
+    echo "⚠️  Skipping Ollama model pull (SKIP_OLLAMA=true)"
+fi
 
 # Create necessary directories
 echo "📁 Creating directories..."
