@@ -1,11 +1,40 @@
 {
-  "name": "project-0",
-  "version": "0.1.0",
+  "name": "pdf-quiz-generator",
+  "version": "1.0.0",
   "private": true,
+  "description": "AI-powered PDF to Quiz Generator",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\" \"pnpm --filter nlp-service dev\"",
+    "build": "pnpm --filter shared build && pnpm --filter backend build && pnpm --filter frontend build",
+    "test": "pnpm --recursive test",
+    "test:unit": "pnpm --recursive test:unit",
+    "test:integration": "pnpm --recursive test:integration",
+    "test:e2e": "playwright test",
+    "lint": "pnpm --recursive lint",
+    "lint:fix": "pnpm --recursive lint:fix",
+    "type-check": "pnpm --recursive type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prepare": "husky install",
+    "db:migrate": "pnpm --filter backend db:migrate",
+    "db:seed": "pnpm --filter backend db:seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
   "workspaces": [
     "packages/*"
-  ],
-  "scripts": {
-    "start": "echo \"Start script not implemented\""
-  }
+  ]
 }
