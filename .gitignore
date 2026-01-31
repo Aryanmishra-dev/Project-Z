@@ -1,10 +1,62 @@
+.# Dependencies
 node_modules/
-.DS_Store
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Production
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
 .env
 .env.local
+.env.*.local
+
+# Logs
 logs/
-uploads/
-dist/
-.cache/
+*.log
+npm-debug.log*
 pnpm-debug.log*
-coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Uploads
+uploads/pdfs/*
+!uploads/pdfs/.gitkeep
+
+# Database
+*.db
+*.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+*.so
+
+# Docker
+.dockerignore
+
+# Temporary
+temp/
+tmp/
+*.tmp
