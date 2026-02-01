@@ -1,0 +1,11 @@
+export { HomePage } from './HomePage';
+export { LoginPage, AuthLayout } from './LoginPage';
+export { RegisterPage } from './RegisterPage';
+export { DashboardPage } from './DashboardPage';
+export { PDFsPage } from './PDFsPage';
+export { PDFDetailPage } from './PDFDetailPage';
+export { QuizPage } from './QuizPage';
+export { QuizResultsPage } from './QuizResultsPage';
+export { AnalyticsPage } from './AnalyticsPage';
+export { SettingsPage } from './SettingsPage';
+export { NotFoundPage } from './NotFoundPage';

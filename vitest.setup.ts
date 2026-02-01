@@ -4,6 +4,7 @@
  */
 
 import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 
 // Global test setup
 beforeAll(async () => {
@@ -24,7 +25,3 @@ beforeEach(() => {
 afterEach(() => {
   // Cleanup after each test
 });
-
-// Extend Vitest matchers if needed
-// import { expect } from 'vitest';
-// expect.extend({});
