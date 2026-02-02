@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
 import { Input } from '../Input';
 
 describe('Input', () => {
@@ -24,7 +25,7 @@ describe('Input', () => {
   it('shows error message', () => {
     render(<Input label="Email" id="email" error="Email is required" />);
     expect(screen.getByText('Email is required')).toBeInTheDocument();
-    expect(screen.getByRole('textbox')).toHaveClass('border-error-300');
+    expect(screen.getByRole('textbox')).toHaveClass('border-error-500');
   });
 
   it('shows hint text', () => {

@@ -2,13 +2,15 @@
  * PDF Service
  * Business logic for PDF document management
  */
+import fs from 'fs/promises';
+
 import { eq, and, desc, isNull, sql, count } from 'drizzle-orm';
+
 import { db } from '../db';
 import { pdfs, type Pdf, type NewPdf, type PdfMetadata } from '../db/schema/pdfs';
 import { questions } from '../db/schema/questions';
 import { NotFoundError, AppError } from '../utils/errors';
 import { logger } from '../utils/logger';
-import fs from 'fs/promises';
 
 /**
  * PDF listing options
@@ -182,7 +184,10 @@ class PdfService {
       errorMessage?: string;
     }
   ): Promise<Pdf> {
-    const updateData: Partial<NewPdf> & { processingStartedAt?: Date; processingCompletedAt?: Date } = {
+    const updateData: Partial<NewPdf> & {
+      processingStartedAt?: Date;
+      processingCompletedAt?: Date;
+    } = {
       status,
       updatedAt: new Date(),
     };
@@ -207,11 +212,7 @@ class PdfService {
       updateData.errorMessage = extras.errorMessage;
     }
 
-    const [updated] = await db
-      .update(pdfs)
-      .set(updateData)
-      .where(eq(pdfs.id, id))
-      .returning();
+    const [updated] = await db.update(pdfs).set(updateData).where(eq(pdfs.id, id)).returning();
 
     if (!updated) {
       throw new NotFoundError('PDF not found');

@@ -26,25 +26,25 @@ describe('JWT Utilities', () => {
 
   describe('parseExpiry', () => {
     it('should parse minutes correctly', () => {
-      expect(parseExpiry('15m')).toBe(15 * 60 * 1000);
-      expect(parseExpiry('1m')).toBe(60 * 1000);
-      expect(parseExpiry('60m')).toBe(60 * 60 * 1000);
+      expect(parseExpiry('15m')).toBe(15 * 60); // Returns seconds
+      expect(parseExpiry('1m')).toBe(60);
+      expect(parseExpiry('60m')).toBe(60 * 60);
     });
 
     it('should parse hours correctly', () => {
-      expect(parseExpiry('1h')).toBe(60 * 60 * 1000);
-      expect(parseExpiry('24h')).toBe(24 * 60 * 60 * 1000);
+      expect(parseExpiry('1h')).toBe(60 * 60);
+      expect(parseExpiry('24h')).toBe(24 * 60 * 60);
     });
 
     it('should parse days correctly', () => {
-      expect(parseExpiry('1d')).toBe(24 * 60 * 60 * 1000);
-      expect(parseExpiry('7d')).toBe(7 * 24 * 60 * 60 * 1000);
-      expect(parseExpiry('30d')).toBe(30 * 24 * 60 * 60 * 1000);
+      expect(parseExpiry('1d')).toBe(24 * 60 * 60);
+      expect(parseExpiry('7d')).toBe(7 * 24 * 60 * 60);
+      expect(parseExpiry('30d')).toBe(30 * 24 * 60 * 60);
     });
 
-    it('should default to 15 minutes for invalid format', () => {
-      expect(parseExpiry('invalid')).toBe(15 * 60 * 1000);
-      expect(parseExpiry('')).toBe(15 * 60 * 1000);
+    it('should default to 900 seconds for invalid format', () => {
+      expect(parseExpiry('invalid')).toBe(900); // 15 minutes in seconds
+      expect(parseExpiry('')).toBe(900);
     });
   });
 

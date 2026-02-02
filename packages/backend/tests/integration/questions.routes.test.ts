@@ -1,10 +1,11 @@
 /**
  * Questions Routes Integration Tests
  */
-import { describe, it, expect, vi, beforeAll } from 'vitest';
-import request from 'supertest';
-import { createApp } from '../../src/app';
 import { Express } from 'express';
+import request from 'supertest';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
+
+import { createApp } from '../../src/app';
 
 // Mock dependencies
 vi.mock('../../src/db', () => ({
@@ -52,7 +53,7 @@ vi.mock('../../src/middleware/auth', async () => {
 
 describe('Questions Routes', () => {
   let app: Express;
-  
+
   beforeAll(() => {
     app = createApp();
   });
@@ -87,7 +88,9 @@ describe('Questions Routes', () => {
 
     it('should validate validationStatus enum', async () => {
       const response = await request(app)
-        .get('/api/v1/questions?pdfId=550e8400-e29b-41d4-a716-446655440000&validationStatus=invalid')
+        .get(
+          '/api/v1/questions?pdfId=550e8400-e29b-41d4-a716-446655440000&validationStatus=invalid'
+        )
         .set('Authorization', 'Bearer test-token')
         .expect(400);
 
@@ -134,7 +137,9 @@ describe('Questions Routes', () => {
 
     it('should validate difficulty enum', async () => {
       const response = await request(app)
-        .get('/api/v1/questions/random?pdfId=550e8400-e29b-41d4-a716-446655440000&difficulty=invalid')
+        .get(
+          '/api/v1/questions/random?pdfId=550e8400-e29b-41d4-a716-446655440000&difficulty=invalid'
+        )
         .set('Authorization', 'Bearer test-token')
         .expect(400);
 

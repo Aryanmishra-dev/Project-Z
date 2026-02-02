@@ -3,6 +3,7 @@
  * Tracks JWT refresh tokens for session management
  */
 import { pgTable, uuid, timestamp, text, boolean } from 'drizzle-orm/pg-core';
+
 import { users } from './users';
 
 /**

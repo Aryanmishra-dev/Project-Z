@@ -2,9 +2,10 @@
  * Security Middleware Configuration
  * Implements security headers, CORS, and protection measures
  */
-import helmet from 'helmet';
 import cors from 'cors';
 import type { Express, Request, Response, NextFunction } from 'express';
+import helmet from 'helmet';
+
 import { logger } from '../utils/logger';
 
 /**
@@ -98,11 +99,7 @@ export const corsConfig = cors({
 /**
  * Additional security headers not covered by Helmet
  */
-export function additionalSecurityHeaders(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function additionalSecurityHeaders(req: Request, res: Response, next: NextFunction): void {
   // Permissions Policy (formerly Feature Policy)
   res.setHeader(
     'Permissions-Policy',
@@ -137,11 +134,7 @@ export function additionalSecurityHeaders(
 /**
  * Request sanitization middleware
  */
-export function sanitizeRequest(
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): void {
+export function sanitizeRequest(req: Request, _res: Response, next: NextFunction): void {
   // Sanitize common injection patterns from all string inputs
   const sanitize = (obj: Record<string, unknown>): void => {
     for (const key in obj) {
@@ -150,7 +143,10 @@ export function sanitizeRequest(
         // Remove null bytes
         obj[key] = value.replace(/\0/g, '');
         // Remove common XSS patterns (basic protection, use DOMPurify for HTML)
-        obj[key] = (obj[key] as string).replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        obj[key] = (obj[key] as string).replace(
+          /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+          ''
+        );
       } else if (typeof value === 'object' && value !== null) {
         sanitize(value as Record<string, unknown>);
       }
@@ -173,16 +169,12 @@ export function sanitizeRequest(
 /**
  * SQL Injection detection middleware (additional layer)
  */
-export function detectSqlInjection(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function detectSqlInjection(req: Request, res: Response, next: NextFunction): void {
   const sqlPatterns = [
-    /(\%27)|(\')|(\-\-)|(\%23)|(#)/i,
-    /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i,
-    /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/i,
-    /((\%27)|(\'))union/i,
+    /(%27)|(')|(--|%23)|(#)/i,
+    /((%3D)|(=))[^\n]*((%27)|(')|(--|%3B)|(;))/i,
+    /\w*((%27)|(')|(%6F)|o|(%4F))((%72)|r|(%52))/i,
+    /((%27)|("))union/i,
     /exec(\s|\+)+(s|x)p\w+/i,
   ];
 
@@ -229,11 +221,7 @@ export function detectSqlInjection(
 /**
  * XSS detection middleware (additional layer)
  */
-export function detectXss(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function detectXss(req: Request, res: Response, next: NextFunction): void {
   const xssPatterns = [
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
     /javascript:/gi,

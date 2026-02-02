@@ -17,20 +17,19 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true
   },
-  "include": [
-    "scripts/**/*",
-    "src/**/*"
-  ],
+  "include": ["scripts/**/*", "src/**/*"],
   "exclude": [
     "node_modules",
     "**/node_modules",
     "**/dist",
     "packages",
     "e2e",
-    "**/*.js",
-    "**/*.test.ts",
-    "**/*.test.tsx",
     "**/*.spec.ts",
-    "**/*.spec.tsx"
+    "**/*.spec.tsx",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "scripts/load-test/**/*.js",
+    "venv",
+    "**/site-packages"
   ]
 }

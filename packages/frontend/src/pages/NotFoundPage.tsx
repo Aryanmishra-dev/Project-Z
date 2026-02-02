@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 import { Button } from '@/components/ui';
 import { ROUTES } from '@/utils/constants';
 

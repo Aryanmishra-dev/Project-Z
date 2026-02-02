@@ -3,9 +3,10 @@
  * Schemas for auth-related requests
  */
 import { z } from 'zod';
-import { 
-  emailSchema, 
-  passwordSchema, 
+
+import {
+  emailSchema,
+  passwordSchema,
   fullNameSchema,
   refreshTokenSchema as baseRefreshTokenSchema,
 } from './common.schemas';
@@ -44,16 +45,15 @@ export const logoutSchema = z.object({
 /**
  * Change password request schema
  */
-export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: passwordSchema,
-}).refine(
-  (data) => data.currentPassword !== data.newPassword,
-  { 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: passwordSchema,
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
     message: 'New password must be different from current password',
     path: ['newPassword'],
-  }
-);
+  });
 
 /**
  * Password reset request schema (initiate reset)
@@ -73,13 +73,14 @@ export const confirmPasswordResetSchema = z.object({
 /**
  * Update profile schema
  */
-export const updateProfileSchema = z.object({
-  fullName: fullNameSchema.optional(),
-  email: emailSchema.optional(),
-}).refine(
-  (data) => data.fullName !== undefined || data.email !== undefined,
-  { message: 'At least one field must be provided' }
-);
+export const updateProfileSchema = z
+  .object({
+    fullName: fullNameSchema.optional(),
+    email: emailSchema.optional(),
+  })
+  .refine((data) => data.fullName !== undefined || data.email !== undefined, {
+    message: 'At least one field must be provided',
+  });
 
 /**
  * Email verification schema

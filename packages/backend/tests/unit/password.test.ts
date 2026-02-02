@@ -3,6 +3,7 @@
  * Tests for Argon2id password hashing and validation
  */
 import { describe, it, expect } from 'vitest';
+
 import {
   hashPassword,
   verifyPassword,
@@ -16,7 +17,7 @@ describe('Password Utilities', () => {
     it('should hash a password', async () => {
       const password = 'TestPassword123!';
       const hash = await hashPassword(password);
-      
+
       expect(hash).toBeDefined();
       expect(hash).not.toBe(password);
       expect(hash.startsWith('$argon2id$')).toBe(true);
@@ -26,7 +27,7 @@ describe('Password Utilities', () => {
       const password = 'TestPassword123!';
       const hash1 = await hashPassword(password);
       const hash2 = await hashPassword(password);
-      
+
       expect(hash1).not.toBe(hash2);
     });
 
@@ -46,8 +47,8 @@ describe('Password Utilities', () => {
       const password = 'пароль密码🔐Test123!';
       const hash = await hashPassword(password);
       expect(hash).toBeDefined();
-      
-      const isValid = await verifyPassword(password, hash);
+
+      const isValid = await verifyPassword(hash, password);
       expect(isValid).toBe(true);
     });
   });
@@ -56,37 +57,38 @@ describe('Password Utilities', () => {
     it('should verify correct password', async () => {
       const password = 'TestPassword123!';
       const hash = await hashPassword(password);
-      
-      const isValid = await verifyPassword(password, hash);
+
+      const isValid = await verifyPassword(hash, password);
       expect(isValid).toBe(true);
     });
 
     it('should reject incorrect password', async () => {
       const password = 'TestPassword123!';
       const hash = await hashPassword(password);
-      
-      const isValid = await verifyPassword('WrongPassword123!', hash);
+
+      const isValid = await verifyPassword(hash, 'WrongPassword123!');
       expect(isValid).toBe(false);
     });
 
     it('should reject similar but different password', async () => {
       const password = 'TestPassword123!';
       const hash = await hashPassword(password);
-      
-      const isValid = await verifyPassword('TestPassword123', hash);
+
+      const isValid = await verifyPassword(hash, 'TestPassword123');
       expect(isValid).toBe(false);
     });
 
     it('should reject case-different password', async () => {
       const password = 'TestPassword123!';
       const hash = await hashPassword(password);
-      
-      const isValid = await verifyPassword('testpassword123!', hash);
+
+      const isValid = await verifyPassword(hash, 'testpassword123!');
       expect(isValid).toBe(false);
     });
 
     it('should handle invalid hash format', async () => {
-      await expect(verifyPassword('password', 'invalid-hash')).rejects.toThrow();
+      const result = await verifyPassword('invalid-hash', 'password');
+      expect(result).toBe(false);
     });
   });
 
@@ -94,7 +96,7 @@ describe('Password Utilities', () => {
     it('should return false for recently hashed password', async () => {
       const password = 'TestPassword123!';
       const hash = await hashPassword(password);
-      
+
       const needs = await needsRehash(hash);
       expect(needs).toBe(false);
     });
@@ -118,7 +120,7 @@ describe('Password Utilities', () => {
     it('should reject short password', () => {
       const result = validatePasswordStrength('Sh@rt1');
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('Password must be at least 8 characters');
+      expect(result.errors).toContain('Password must be at least 8 characters long');
     });
 
     it('should reject password without uppercase', () => {
@@ -136,7 +138,7 @@ describe('Password Utilities', () => {
     it('should reject password without digit', () => {
       const result = validatePasswordStrength('NoDigits!@#');
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('Password must contain at least one digit');
+      expect(result.errors).toContain('Password must contain at least one number');
     });
 
     it('should reject password without special character', () => {

@@ -4,17 +4,17 @@
  */
 
 export { db, pool, checkDatabaseConnection, closeDatabaseConnection, schema } from './database';
-export { 
-  redis, 
-  REDIS_KEYS, 
-  buildRedisKey, 
-  checkRedisConnection, 
+export {
+  redis,
+  REDIS_KEYS,
+  buildRedisKey,
+  checkRedisConnection,
   closeRedisConnection,
   storeSession,
   getSession,
   deleteSession,
   deleteAllUserSessions,
-  type SessionData
+  type SessionData,
 } from './redis';
 export {
   jwtConfig,

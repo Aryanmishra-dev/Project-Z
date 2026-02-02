@@ -2,7 +2,6 @@
  * Validation schema tests
  * Tests for Zod validation schemas
  */
-import { describe, it, expect } from 'vitest';
 import {
   registerSchema,
   loginSchema,
@@ -13,6 +12,7 @@ import {
   paginationSchema,
   uuidSchema,
 } from '@project-z/shared';
+import { describe, it, expect } from 'vitest';
 
 describe('Validation Schemas', () => {
   describe('emailSchema', () => {

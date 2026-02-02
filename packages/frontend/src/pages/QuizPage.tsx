@@ -1,18 +1,24 @@
-import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle } from 'lucide-react';
-import { Spinner, Button } from '@/components/ui';
+import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 import { QuizInterface } from '@/components/features/quiz';
+import { Spinner, Button } from '@/components/ui';
 import { quizService } from '@/services';
 import { useQuizStore } from '@/stores/quizStore';
 import { ROUTES } from '@/utils/constants';
-import { Link } from 'react-router-dom';
 
 export function QuizPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const clearQuiz = useQuizStore((state) => state.clearQuiz);
 
-  const { data: session, isLoading, isError, error } = useQuery({
+  const {
+    data: session,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['quiz-session', sessionId],
     queryFn: () => quizService.getSession(sessionId!),
     enabled: !!sessionId,

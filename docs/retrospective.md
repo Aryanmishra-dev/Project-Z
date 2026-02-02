@@ -5,14 +5,16 @@
 **Project Name**: PDF Quiz Generator  
 **Duration**: 6 weeks (42 days)  
 **Team Size**: 1 developer  
-**Completion Date**: February 2026  
+**Completion Date**: February 2026
 
 ---
 
 ## What Went Well
 
 ### 1. Phased Approach
+
 The 6-phase development approach kept the project organized and manageable:
+
 - **Phase 1**: Foundation (Auth + Database) - Clean architecture from day one
 - **Phase 2**: NLP Service (LLM + PDF) - Isolated complexity in dedicated service
 - **Phase 3**: Backend API (REST + Jobs) - Solid RESTful design
@@ -21,28 +23,36 @@ The 6-phase development approach kept the project organized and manageable:
 - **Phase 6**: Testing & Deployment - Production-ready delivery
 
 ### 2. MCP Rules Ensured Code Quality
+
 Strict adherence to Model Context Protocol rules resulted in:
+
 - Consistent code style across all packages
 - Comprehensive error handling
 - Type safety throughout the stack
 - Well-documented APIs
 
 ### 3. Test-First Approach
+
 Writing tests alongside features caught bugs early:
+
 - Unit tests prevented regression
 - Integration tests validated flows
 - E2E tests ensured user journeys work
 - Load tests identified bottlenecks before production
 
 ### 4. WebSocket Integration
+
 Real-time features worked smoothly:
+
 - Live quiz progress updates
 - Instant notification delivery
 - Reconnection handling was robust
 - Room-based communication scaled well
 
 ### 5. LLM Validation Prevented Bad Questions
+
 Multi-layer validation for AI-generated content:
+
 - Syntax validation catches malformed output
 - Semantic validation ensures answer correctness
 - Difficulty calibration maintains consistency
@@ -53,21 +63,25 @@ Multi-layer validation for AI-generated content:
 ## What Could Be Improved
 
 ### 1. Database Schema Changes Mid-Project
+
 - Initial schema lacked some fields needed later
 - Had to run migrations that touched existing data
 - **Lesson**: Spend more time on schema design upfront
 
 ### 2. Underestimated PDF Processing Time
+
 - Complex PDFs with tables/images took longer than expected
 - Initial timeout was too short (30s → increased to 120s)
 - **Lesson**: Build generous timeouts for external services
 
 ### 3. More User Testing Needed
+
 - UI assumptions didn't always match user expectations
 - Some workflows were unintuitive initially
 - **Lesson**: Get user feedback earlier and more often
 
 ### 4. Documentation Took Longer Than Expected
+
 - Comprehensive docs required significant time
 - Keeping docs in sync with code changes was challenging
 - **Lesson**: Document as you code, not at the end
@@ -110,28 +124,32 @@ Multi-layer validation for AI-generated content:
 ## Technical Achievements
 
 ### Test Coverage
-| Package | Target | Achieved | Status |
-|---------|--------|----------|--------|
-| Backend | 80% | 82% | ✅ Exceeded |
-| Frontend | 75% | 78% | ✅ Exceeded |
-| NLP Service | 70% | 73% | ✅ Exceeded |
-| **Overall** | **80%** | **81%** | ✅ **Exceeded** |
+
+| Package     | Target  | Achieved | Status          |
+| ----------- | ------- | -------- | --------------- |
+| Backend     | 80%     | 82%      | ✅ Exceeded     |
+| Frontend    | 75%     | 78%      | ✅ Exceeded     |
+| NLP Service | 70%     | 73%      | ✅ Exceeded     |
+| **Overall** | **80%** | **81%**  | ✅ **Exceeded** |
 
 ### Performance Metrics
-| Metric | Target | Achieved | Status |
-|--------|--------|----------|--------|
-| API P95 Response Time | < 500ms | 320ms | ✅ Beat by 36% |
-| Concurrent Users | 10 | 12 | ✅ Beat by 20% |
-| Error Rate (under load) | < 1% | 0.3% | ✅ Beat by 70% |
-| Lighthouse Score | ≥ 90 | 94 | ✅ Exceeded |
+
+| Metric                  | Target  | Achieved | Status         |
+| ----------------------- | ------- | -------- | -------------- |
+| API P95 Response Time   | < 500ms | 320ms    | ✅ Beat by 36% |
+| Concurrent Users        | 10      | 12       | ✅ Beat by 20% |
+| Error Rate (under load) | < 1%    | 0.3%     | ✅ Beat by 70% |
+| Lighthouse Score        | ≥ 90    | 94       | ✅ Exceeded    |
 
 ### Security
+
 - **OWASP ZAP Scan**: 0 Critical, 0 High vulnerabilities
 - **Dependencies**: All up-to-date, no known CVEs
 - **Authentication**: RS256 JWT + Argon2id passwords
 - **Data Protection**: AES-256 encryption at rest
 
 ### Infrastructure
+
 - **Uptime Target**: 99.5%
 - **Deployment Time**: < 5 minutes
 - **Rollback Time**: < 2 minutes
@@ -197,6 +215,7 @@ Multi-layer validation for AI-generated content:
 ## Metrics Summary
 
 ### Development Metrics
+
 - **Total Lines of Code**: ~25,000
 - **Total Commits**: ~180
 - **Total Tests**: 156
@@ -205,6 +224,7 @@ Multi-layer validation for AI-generated content:
 - **Database Tables**: 12
 
 ### Quality Metrics
+
 - **TypeScript Strict Mode**: Enabled
 - **ESLint Violations**: 0
 - **Type Coverage**: 98%
@@ -232,9 +252,10 @@ PDF Quiz Generator successfully achieved all Phase 1-6 objectives:
 ✅ Comprehensive analytics dashboard  
 ✅ Production deployment with monitoring  
 ✅ 80%+ test coverage across all packages  
-✅ Complete documentation suite  
+✅ Complete documentation suite
 
 The project demonstrates proficiency in:
+
 - Modern TypeScript/React development
 - LLM integration and prompt engineering
 - Real-time application architecture
@@ -246,4 +267,4 @@ The project demonstrates proficiency in:
 
 ---
 
-*Retrospective written: February 1, 2026*
+_Retrospective written: February 1, 2026_

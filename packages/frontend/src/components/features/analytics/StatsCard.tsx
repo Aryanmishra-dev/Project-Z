@@ -1,4 +1,5 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui';
 import { cn } from '@/utils/cn';
 
@@ -48,21 +49,27 @@ export function StatsCard({
     <Card>
       <CardContent className="p-6">
         <div className="flex items-center gap-4">
-          <div className={cn('flex h-12 w-12 items-center justify-center rounded-lg', variantStyles[variant])}>
+          <div
+            className={cn(
+              'flex h-12 w-12 items-center justify-center rounded-lg',
+              variantStyles[variant]
+            )}
+          >
             {icon}
           </div>
           <div className="flex-1">
             <p className="text-sm font-medium text-gray-500">{label}</p>
             <p className="text-2xl font-bold text-gray-900">{value}</p>
-            {subValue && (
-              <p className="text-xs text-gray-400">{subValue}</p>
-            )}
+            {subValue && <p className="text-xs text-gray-400">{subValue}</p>}
           </div>
         </div>
         {change && (
           <div className={cn('mt-4 flex items-center gap-1 text-sm', getTrendColor())}>
             {getTrendIcon()}
-            <span>{change.value > 0 ? '+' : ''}{change.value}%</span>
+            <span>
+              {change.value > 0 ? '+' : ''}
+              {change.value}%
+            </span>
             <span className="text-gray-500">from {change.period}</span>
           </div>
         )}

@@ -3,6 +3,7 @@
  * Job queue setup for PDF processing
  */
 import { Queue, Job, QueueEvents } from 'bullmq';
+
 import { logger } from '../utils/logger';
 
 /**
@@ -37,7 +38,14 @@ export interface PdfProcessingJobResult {
  * Job progress data
  */
 export interface JobProgress {
-  stage: 'uploading' | 'extracting' | 'generating' | 'validating' | 'saving' | 'completed' | 'failed';
+  stage:
+    | 'uploading'
+    | 'extracting'
+    | 'generating'
+    | 'validating'
+    | 'saving'
+    | 'completed'
+    | 'failed';
   percentage: number;
   message: string;
   currentStep?: number;
@@ -92,13 +100,19 @@ export const pdfProcessingQueueEvents = new QueueEvents(QUEUE_NAMES.PDF_PROCESSI
 });
 
 // Event listeners for logging
-pdfProcessingQueueEvents.on('completed', ({ jobId, returnvalue }: { jobId: string; returnvalue: any }) => {
-  logger.info('PDF processing job completed', { jobId, result: returnvalue });
-});
+pdfProcessingQueueEvents.on(
+  'completed',
+  ({ jobId, returnvalue }: { jobId: string; returnvalue: any }) => {
+    logger.info('PDF processing job completed', { jobId, result: returnvalue });
+  }
+);
 
-pdfProcessingQueueEvents.on('failed', ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
-  logger.error('PDF processing job failed', { jobId, reason: failedReason });
-});
+pdfProcessingQueueEvents.on(
+  'failed',
+  ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
+    logger.error('PDF processing job failed', { jobId, reason: failedReason });
+  }
+);
 
 pdfProcessingQueueEvents.on('progress', ({ jobId, data }: { jobId: string; data: any }) => {
   logger.debug('PDF processing job progress', { jobId, progress: data });
@@ -111,11 +125,13 @@ pdfProcessingQueueEvents.on('stalled', ({ jobId }: { jobId: string }) => {
 /**
  * Add a PDF processing job to the queue
  */
-export async function addPdfProcessingJob(data: PdfProcessingJobData): Promise<Job<PdfProcessingJobData, PdfProcessingJobResult>> {
+export async function addPdfProcessingJob(
+  data: PdfProcessingJobData
+): Promise<Job<PdfProcessingJobData, PdfProcessingJobResult>> {
   const job = await pdfProcessingQueue.add(`process-pdf-${data.pdfId}`, data, {
     jobId: `pdf-${data.pdfId}`, // Use PDF ID as job ID for deduplication
   });
-  
+
   logger.info('PDF processing job added', { jobId: job.id, pdfId: data.pdfId });
   return job;
 }
@@ -123,7 +139,9 @@ export async function addPdfProcessingJob(data: PdfProcessingJobData): Promise<J
 /**
  * Get job by PDF ID
  */
-export async function getJobByPdfId(pdfId: string): Promise<Job<PdfProcessingJobData, PdfProcessingJobResult> | undefined> {
+export async function getJobByPdfId(
+  pdfId: string
+): Promise<Job<PdfProcessingJobData, PdfProcessingJobResult> | undefined> {
   return pdfProcessingQueue.getJob(`pdf-${pdfId}`);
 }
 
@@ -195,12 +213,12 @@ export async function getQueueStats(): Promise<{
  */
 export async function cleanupJobs(): Promise<void> {
   const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  
+
   await Promise.all([
     pdfProcessingQueue.clean(oneWeekAgo, 1000, 'completed'),
     pdfProcessingQueue.clean(oneWeekAgo, 1000, 'failed'),
   ]);
-  
+
   logger.info('Queue cleanup completed');
 }
 
@@ -208,10 +226,7 @@ export async function cleanupJobs(): Promise<void> {
  * Close queue connections gracefully
  */
 export async function closeQueues(): Promise<void> {
-  await Promise.all([
-    pdfProcessingQueue.close(),
-    pdfProcessingQueueEvents.close(),
-  ]);
-  
+  await Promise.all([pdfProcessingQueue.close(), pdfProcessingQueueEvents.close()]);
+
   logger.info('Queue connections closed');
 }

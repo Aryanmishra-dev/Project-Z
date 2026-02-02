@@ -1,6 +1,7 @@
-import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import * as React from 'react';
+
 import { cn } from '@/utils/cn';
 
 const Select = SelectPrimitive.Root;
@@ -31,9 +32,7 @@ const SelectTrigger = React.forwardRef<
           'placeholder:text-gray-400',
           'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          error
-            ? 'border-error-500 focus:ring-error-500'
-            : 'border-gray-300 hover:border-gray-400',
+          error ? 'border-error-500 focus:ring-error-500' : 'border-gray-300 hover:border-gray-400',
           className
         )}
         aria-invalid={error ? 'true' : 'false'}

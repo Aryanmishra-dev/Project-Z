@@ -4,14 +4,10 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import {
-  authenticate,
-  validate,
-  checkQuizSessionOwnership,
-  asyncHandler,
-} from '../middleware';
-import { quizSessionsService } from '../services/quiz-sessions.service';
+
+import { authenticate, validate, checkQuizSessionOwnership, asyncHandler } from '../middleware';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { quizSessionsService } from '../services/quiz-sessions.service';
 import { NotFoundError, AuthorizationError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
@@ -164,7 +160,9 @@ router.get(
   validate(listSessionsSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const userId = req.user!.sub;
-    const { pdfId, status, limit, offset } = req.query as z.infer<typeof listSessionsSchema>['query'];
+    const { pdfId, status, limit, offset } = req.query as z.infer<
+      typeof listSessionsSchema
+    >['query'];
 
     const result = await quizSessionsService.list({
       userId,
@@ -435,9 +433,8 @@ router.get(
           correctAnswers: session.correctAnswers,
           scorePercentage: session.scorePercentage,
           totalTimeSeconds: totalTime,
-          averageTimePerQuestion: session.answers.length > 0
-            ? Math.round(totalTime / session.answers.length)
-            : 0,
+          averageTimePerQuestion:
+            session.answers.length > 0 ? Math.round(totalTime / session.answers.length) : 0,
           byDifficulty: correctByDifficulty,
         },
       },

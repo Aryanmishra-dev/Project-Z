@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   TooltipProps,
 } from 'recharts';
+
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 import { formatDate } from '@/utils/formatters';
 
@@ -24,9 +25,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
   if (active && payload && payload.length) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
-        <p className="text-sm font-medium text-gray-900">
-          {formatDate(label, 'MMM d, yyyy')}
-        </p>
+        <p className="text-sm font-medium text-gray-900">{formatDate(label, 'MMM d, yyyy')}</p>
         <p className="text-sm text-primary-600">
           Score: <span className="font-semibold">{payload?.[0]?.value ?? 0}%</span>
         </p>
@@ -51,7 +50,9 @@ export function PerformanceChart({ data, title = 'Score Trend' }: PerformanceCha
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent className="flex h-[300px] items-center justify-center">
-          <p className="text-gray-500">No data available yet. Take some quizzes to see your progress!</p>
+          <p className="text-gray-500">
+            No data available yet. Take some quizzes to see your progress!
+          </p>
         </CardContent>
       </Card>
     );
@@ -65,10 +66,7 @@ export function PerformanceChart({ data, title = 'Score Trend' }: PerformanceCha
       <CardContent>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
-            >
+            <LineChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis
                 dataKey="formattedDate"

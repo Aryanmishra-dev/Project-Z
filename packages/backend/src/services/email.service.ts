@@ -1,11 +1,12 @@
 /**
  * Email Service
- * 
+ *
  * Handles sending email notifications for alerts and system events.
  * Uses Nodemailer with configurable SMTP transport.
  */
 
 import nodemailer from 'nodemailer';
+
 import { emailConfig, alertTemplates } from '../config/alerts.config';
 import logger from '../config/logger.config';
 
@@ -132,14 +133,12 @@ class EmailService {
       return false;
     }
 
-    const subject = this.interpolateTemplate(
-      alertTemplates.email.subject[data.severity],
-      data
-    );
+    const subject = this.interpolateTemplate(alertTemplates.email.subject[data.severity], data);
 
     const html = this.interpolateTemplate(alertTemplates.email.body, {
       ...data,
-      dashboardUrl: data.dashboardUrl || process.env.DASHBOARD_URL || 'https://pdfquizgen.com/monitoring',
+      dashboardUrl:
+        data.dashboardUrl || process.env.DASHBOARD_URL || 'https://pdfquizgen.com/monitoring',
     });
 
     return this.sendEmail({
@@ -153,7 +152,9 @@ class EmailService {
   /**
    * Send alert resolution email
    */
-  async sendAlertResolvedEmail(data: Omit<AlertEmailData, 'currentValue'> & { resolvedAt: string }): Promise<boolean> {
+  async sendAlertResolvedEmail(
+    data: Omit<AlertEmailData, 'currentValue'> & { resolvedAt: string }
+  ): Promise<boolean> {
     const recipients = emailConfig.recipients;
 
     if (recipients.length === 0) {

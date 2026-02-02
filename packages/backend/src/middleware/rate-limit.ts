@@ -2,8 +2,9 @@
  * Rate limiting middleware
  * Implements rate limiting with Redis storage for distributed environments
  */
-import rateLimit from 'express-rate-limit';
 import { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
+
 import { redis, buildRedisKey, REDIS_KEYS } from '../config/redis';
 import { logger } from '../utils/logger';
 
@@ -37,32 +38,43 @@ class RedisStore {
    * Increment hit count for a key
    */
   async increment(key: string): Promise<{ totalHits: number; resetTime: Date }> {
-    const redisKey = buildRedisKey(this.prefix, key);
-    const now = Date.now();
-    const windowStart = now - this.windowMs;
+    try {
+      const redisKey = buildRedisKey(this.prefix, key);
+      const now = Date.now();
+      const windowStart = now - this.windowMs;
 
-    // Use a sorted set to track request timestamps
-    const pipeline = redis.pipeline();
-    
-    // Remove old entries outside the window
-    pipeline.zremrangebyscore(redisKey, '-inf', windowStart);
-    
-    // Add current timestamp
-    pipeline.zadd(redisKey, now, `${now}-${Math.random()}`);
-    
-    // Count entries in window
-    pipeline.zcard(redisKey);
-    
-    // Set expiry on the key
-    pipeline.pexpire(redisKey, this.windowMs);
-    
-    const results = await pipeline.exec();
-    
-    // Get count from results (index 2 is zcard result)
-    const totalHits = results?.[2]?.[1] as number || 0;
-    const resetTime = new Date(now + this.windowMs);
-    
-    return { totalHits, resetTime };
+      // Use a sorted set to track request timestamps
+      const pipeline = redis.pipeline();
+
+      // Remove old entries outside the window
+      pipeline.zremrangebyscore(redisKey, '-inf', windowStart);
+
+      // Add current timestamp
+      pipeline.zadd(redisKey, now, `${now}-${Math.random()}`);
+
+      // Count entries in window
+      pipeline.zcard(redisKey);
+
+      // Set expiry on the key
+      pipeline.pexpire(redisKey, this.windowMs);
+
+      const results = (await Promise.race([
+        pipeline.exec(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Redis timeout')), 1000)),
+      ])) as any;
+
+      // Get count from results (index 2 is zcard result)
+      const totalHits = (results?.[2]?.[1] as number) || 0;
+      const resetTime = new Date(now + this.windowMs);
+
+      return { totalHits, resetTime };
+    } catch (error) {
+      logger.warn('Rate limit Redis error, allowing request', {
+        error: error instanceof Error ? error.message : 'Unknown',
+      });
+      // On error, allow the request (fail open)
+      return { totalHits: 0, resetTime: new Date(Date.now() + this.windowMs) };
+    }
   }
 
   /**
@@ -95,7 +107,7 @@ function getClientIp(req: Request): string {
     const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor.split(',')[0];
     return ips?.trim() || 'unknown';
   }
-  
+
   return req.ip || req.socket.remoteAddress || 'unknown';
 }
 
@@ -104,23 +116,23 @@ function getClientIp(req: Request): string {
  */
 function createRateLimiter(config: RateLimitConfig, name: string) {
   const store = new RedisStore(buildRedisKey(REDIS_KEYS.RATE_LIMIT, name), config.windowMs);
-  
+
   return rateLimit({
     windowMs: config.windowMs,
     max: config.max,
     standardHeaders: true, // Return rate limit info in headers
-    legacyHeaders: false,  // Disable X-RateLimit headers
+    legacyHeaders: false, // Disable X-RateLimit headers
     skipSuccessfulRequests: config.skipSuccessfulRequests || false,
     keyGenerator: config.keyGenerator || ((req) => getClientIp(req)),
     handler: (_req: Request, res: Response) => {
       const retryAfter = Math.ceil(config.windowMs / 1000);
-      
+
       logger.warn('Rate limit exceeded', {
         ip: getClientIp(_req),
         path: _req.path,
         retryAfter,
       });
-      
+
       res.status(429).json({
         success: false,
         error: {

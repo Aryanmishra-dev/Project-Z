@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+
 import { authService } from '@/services/auth.service';
 import type { User, LoginCredentials, RegisterData } from '@/types';
 
@@ -137,10 +138,7 @@ export const useAuthStore = create<AuthStore>()(
             setTimeout(() => reject(new Error('Auth check timed out')), 5000);
           });
 
-          const user = await Promise.race([
-            authService.getProfile(),
-            timeoutPromise,
-          ]);
+          const user = await Promise.race([authService.getProfile(), timeoutPromise]);
 
           set({
             user,

@@ -20,11 +20,11 @@ This guide covers deploying the PDF Quiz Generator to production, with specific 
 
 ### Hardware Requirements (Mac Mini M4)
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| RAM | 8 GB | 16+ GB |
-| Storage | 256 GB SSD | 512+ GB SSD |
-| Network | 100 Mbps | 1 Gbps |
+| Component | Minimum    | Recommended |
+| --------- | ---------- | ----------- |
+| RAM       | 8 GB       | 16+ GB      |
+| Storage   | 256 GB SSD | 512+ GB SSD |
+| Network   | 100 Mbps   | 1 Gbps      |
 
 ### Software Requirements
 
@@ -112,11 +112,11 @@ server {
     listen 80;
     listen [::]:80;
     server_name your-domain.com www.your-domain.com;
-    
+
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
-    
+
     location / {
         return 301 https://$host$request_uri;
     }
@@ -127,12 +127,12 @@ server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name your-domain.com www.your-domain.com;
-    
+
     # SSL certificates
     ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
     ssl_trusted_certificate /etc/letsencrypt/live/your-domain.com/chain.pem;
-    
+
     # SSL configuration
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:50m;
@@ -140,45 +140,45 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
-    
+
     # HSTS
     add_header Strict-Transport-Security "max-age=63072000" always;
-    
+
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    
+
     # Connection limits
     limit_conn conn_limit 20;
-    
+
     # Gzip compression
     gzip on;
     gzip_vary on;
     gzip_proxied any;
     gzip_comp_level 6;
     gzip_types text/plain text/css text/xml application/json application/javascript application/rss+xml application/atom+xml image/svg+xml;
-    
+
     # Static files (frontend)
     root /opt/apps/pdfquiz/packages/frontend/dist;
     index index.html;
-    
+
     # Frontend routing
     location / {
         try_files $uri $uri/ /index.html;
-        
+
         # Cache static assets
         location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
             expires 1y;
             add_header Cache-Control "public, immutable";
         }
     }
-    
+
     # API proxy
     location /api/ {
         limit_req zone=api_limit burst=20 nodelay;
-        
+
         proxy_pass http://backend;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -188,13 +188,13 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
-        
+
         # Timeouts
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
     }
-    
+
     # WebSocket support
     location /socket.io/ {
         proxy_pass http://backend;
@@ -205,25 +205,25 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
-    
+
     # PDF upload endpoint (stricter limits)
     location /api/v1/pdfs {
         limit_req zone=upload_limit burst=5 nodelay;
         client_max_body_size 50M;
-        
+
         proxy_pass http://backend;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
+
         # Longer timeout for uploads
         proxy_connect_timeout 120s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
     }
-    
+
     # NLP service proxy (internal only)
     location /nlp/ {
         internal;
@@ -231,16 +231,16 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Host $host;
     }
-    
+
     # Health check endpoint
     location /health {
         proxy_pass http://backend/api/v1/health;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
-        
+
         access_log off;
     }
-    
+
     # Error pages
     error_page 500 502 503 504 /50x.html;
     location = /50x.html {
@@ -627,6 +627,7 @@ Adjust PM2 instances based on CPU cores:
 ### Common Issues
 
 #### Backend won't start
+
 ```bash
 # Check logs
 pm2 logs pdfquiz-backend --lines 100
@@ -639,6 +640,7 @@ cat /opt/apps/pdfquiz/.env
 ```
 
 #### Database connection errors
+
 ```bash
 # Test connection
 psql -U pdfquiz -d pdfquiz_prod -c "SELECT 1;"
@@ -651,6 +653,7 @@ tail -100 /opt/homebrew/var/log/postgresql@15.log
 ```
 
 #### SSL certificate issues
+
 ```bash
 # Test certificate
 openssl s_client -connect your-domain.com:443 -servername your-domain.com
@@ -663,6 +666,7 @@ sudo certbot renew --force-renewal
 ```
 
 #### High memory usage
+
 ```bash
 # Find memory-heavy processes
 ps aux --sort=-%mem | head -20
@@ -673,13 +677,13 @@ pm2 restart all
 
 ### Logs Location
 
-| Service | Log Location |
-|---------|--------------|
-| Backend | `/opt/apps/pdfquiz/logs/backend-*.log` |
-| NLP Service | `/opt/apps/pdfquiz/logs/nlp-*.log` |
-| Nginx | `/opt/homebrew/var/log/nginx/` |
-| PostgreSQL | `/opt/homebrew/var/log/postgresql@15.log` |
-| Backup | `/opt/apps/pdfquiz/logs/backup.log` |
+| Service     | Log Location                              |
+| ----------- | ----------------------------------------- |
+| Backend     | `/opt/apps/pdfquiz/logs/backend-*.log`    |
+| NLP Service | `/opt/apps/pdfquiz/logs/nlp-*.log`        |
+| Nginx       | `/opt/homebrew/var/log/nginx/`            |
+| PostgreSQL  | `/opt/homebrew/var/log/postgresql@15.log` |
+| Backup      | `/opt/apps/pdfquiz/logs/backup.log`       |
 
 ---
 
@@ -703,4 +707,4 @@ pm2 restart all
 
 ---
 
-*Deployment guide last updated: January 2025*
+_Deployment guide last updated: January 2025_

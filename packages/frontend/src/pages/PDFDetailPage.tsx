@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   FileText,
@@ -11,6 +9,11 @@ import {
   ArrowLeft,
   AlertCircle,
 } from 'lucide-react';
+import { useState } from 'react';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
+
+import { ProcessingStatus } from '@/components/features/pdf';
+import { QuizConfig } from '@/components/features/quiz';
 import {
   Button,
   Card,
@@ -24,12 +27,15 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui';
-import { ProcessingStatus } from '@/components/features/pdf';
-import { QuizConfig } from '@/components/features/quiz';
 import { pdfService } from '@/services';
-import { formatRelativeTime, formatFileSize, formatCount, formatDateTime } from '@/utils/formatters';
-import { ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/cn';
+import { ROUTES } from '@/utils/constants';
+import {
+  formatRelativeTime,
+  formatFileSize,
+  formatCount,
+  formatDateTime,
+} from '@/utils/formatters';
 
 export function PDFDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -38,7 +44,11 @@ export function PDFDetailPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showQuizConfig, setShowQuizConfig] = useState(searchParams.get('action') === 'quiz');
 
-  const { data: pdf, isLoading, isError } = useQuery({
+  const {
+    data: pdf,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ['pdf', id],
     queryFn: () => pdfService.getById(id!),
     enabled: !!id,
@@ -106,7 +116,11 @@ export function PDFDetailPage() {
                 <FileText
                   className={cn(
                     'h-7 w-7',
-                    isCompleted ? 'text-success-600' : isFailed ? 'text-error-600' : 'text-primary-600'
+                    isCompleted
+                      ? 'text-success-600'
+                      : isFailed
+                        ? 'text-error-600'
+                        : 'text-primary-600'
                   )}
                 />
               </div>
@@ -133,10 +147,10 @@ export function PDFDetailPage() {
                 pdf.status === 'completed'
                   ? 'success'
                   : pdf.status === 'failed'
-                  ? 'error'
-                  : pdf.status === 'processing'
-                  ? 'info'
-                  : 'warning'
+                    ? 'error'
+                    : pdf.status === 'processing'
+                      ? 'info'
+                      : 'warning'
               }
               className="text-sm"
             >
@@ -237,8 +251,8 @@ export function PDFDetailPage() {
           <DialogHeader>
             <DialogTitle>Delete PDF?</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{pdf.originalFilename}"? This action cannot be
-              undone and all associated questions will be removed.
+              Are you sure you want to delete "{pdf.originalFilename}"? This action cannot be undone
+              and all associated questions will be removed.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

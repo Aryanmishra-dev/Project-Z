@@ -28,7 +28,7 @@ Create test users in the database before running load tests:
 ```sql
 -- Run in PostgreSQL
 INSERT INTO users (email, password_hash, username, created_at)
-VALUES 
+VALUES
   ('loadtest1@example.com', '<hashed_password>', 'loadtest1', NOW()),
   ('loadtest2@example.com', '<hashed_password>', 'loadtest2', NOW()),
   ('loadtest3@example.com', '<hashed_password>', 'loadtest3', NOW()),
@@ -84,36 +84,36 @@ k6 run scripts/load-test/spike-test.js
 
 ### Load Test Stages
 
-| Duration | Target VUs | Description |
-|----------|------------|-------------|
-| 30s | 2 | Warm up |
-| 1m | 5 | Ramp to 5 users |
-| 2m | 5 | Sustain 5 users |
-| 1m | 10 | Ramp to 10 users |
-| 3m | 10 | Sustain 10 users |
-| 1m | 15 | Ramp to 15 users |
-| 2m | 15 | Sustain 15 users |
-| 1m | 0 | Ramp down |
+| Duration | Target VUs | Description      |
+| -------- | ---------- | ---------------- |
+| 30s      | 2          | Warm up          |
+| 1m       | 5          | Ramp to 5 users  |
+| 2m       | 5          | Sustain 5 users  |
+| 1m       | 10         | Ramp to 10 users |
+| 3m       | 10         | Sustain 10 users |
+| 1m       | 15         | Ramp to 15 users |
+| 2m       | 15         | Sustain 15 users |
+| 1m       | 0          | Ramp down        |
 
 ### Performance Thresholds
 
-| Metric | Threshold | Description |
-|--------|-----------|-------------|
-| http_req_duration p(95) | < 500ms | 95th percentile response time |
-| http_req_duration p(99) | < 1000ms | 99th percentile response time |
-| http_req_failed | < 1% | Overall error rate |
-| success_rate | > 95% | Successful operations |
-| login_failures | < 5 | Authentication failures |
+| Metric                  | Threshold | Description                   |
+| ----------------------- | --------- | ----------------------------- |
+| http_req_duration p(95) | < 500ms   | 95th percentile response time |
+| http_req_duration p(99) | < 1000ms  | 99th percentile response time |
+| http_req_failed         | < 1%      | Overall error rate            |
+| success_rate            | > 95%     | Successful operations         |
+| login_failures          | < 5       | Authentication failures       |
 
 ## Interpreting Results
 
 ### Sample Output
 
 ```
-          /\      |‾‾| /‾‾/   /‾‾/   
-     /\  /  \     |  |/  /   /  /    
-    /  \/    \    |     (   /   ‾‾\  
-   /          \   |  |\  \ |  (‾)  | 
+          /\      |‾‾| /‾‾/   /‾‾/
+     /\  /  \     |  |/  /   /  /
+    /  \/    \    |     (   /   ‾‾\
+   /          \   |  |\  \ |  (‾)  |
   / __________ \  |__| \__\ \_____/ .io
 
   execution: local
@@ -143,6 +143,7 @@ k6 run scripts/load-test/spike-test.js
 If tests reveal performance issues:
 
 1. **Check Database Queries**
+
    ```bash
    # Enable slow query log in PostgreSQL
    ALTER SYSTEM SET log_min_duration_statement = 100;
@@ -150,6 +151,7 @@ If tests reveal performance issues:
    ```
 
 2. **Check Redis Cache Hit Rate**
+
    ```bash
    redis-cli INFO stats | grep keyspace
    ```

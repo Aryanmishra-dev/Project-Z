@@ -101,12 +101,14 @@ export const quizService = {
   /**
    * Get list of user's quiz sessions
    */
-  async listSessions(params: {
-    page?: number;
-    limit?: number;
-    status?: string;
-    pdfId?: string;
-  } = {}): Promise<{
+  async listSessions(
+    params: {
+      page?: number;
+      limit?: number;
+      status?: string;
+      pdfId?: string;
+    } = {}
+  ): Promise<{
     sessions: QuizSession[];
     pagination: {
       page: number;

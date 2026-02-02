@@ -1,13 +1,14 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Upload, FileText, X, AlertCircle } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, X, AlertCircle } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { Button, Progress, Card } from '@/components/ui';
-import { pdfService } from '@/services/pdf.service';
 import { getErrorMessage } from '@/lib/api';
-import { formatFileSize } from '@/utils/formatters';
-import { MAX_FILE_SIZE, ACCEPTED_FILE_TYPES } from '@/utils/constants';
+import { pdfService } from '@/services/pdf.service';
 import { cn } from '@/utils/cn';
+import { MAX_FILE_SIZE, ACCEPTED_FILE_TYPES } from '@/utils/constants';
+import { formatFileSize } from '@/utils/formatters';
 
 interface PDFUploaderProps {
   onSuccess?: () => void;
@@ -34,7 +35,7 @@ export function PDFUploader({ onSuccess }: PDFUploaderProps) {
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
     setError(null);
-    
+
     if (rejectedFiles.length > 0) {
       const rejection = rejectedFiles[0];
       if (rejection.errors[0]?.code === 'file-too-large') {
@@ -63,7 +64,7 @@ export function PDFUploader({ onSuccess }: PDFUploaderProps) {
     if (!selectedFile) return;
     setError(null);
     setUploadProgress(0);
-    
+
     // Simulate progress for UX (actual progress would come from axios config)
     const interval = setInterval(() => {
       setUploadProgress((prev) => {
@@ -127,12 +128,7 @@ export function PDFUploader({ onSuccess }: PDFUploaderProps) {
 
             {uploadMutation.isPending && (
               <div className="mt-4">
-                <Progress
-                  value={uploadProgress}
-                  max={100}
-                  showValue
-                  label="Uploading..."
-                />
+                <Progress value={uploadProgress} max={100} showValue label="Uploading..." />
               </div>
             )}
 
@@ -172,7 +168,10 @@ export function PDFUploader({ onSuccess }: PDFUploaderProps) {
       </div>
 
       {error && (
-        <div className="mt-4 flex items-center gap-2 rounded-md bg-error-50 p-3 text-sm text-error-700" role="alert">
+        <div
+          className="mt-4 flex items-center gap-2 rounded-md bg-error-50 p-3 text-sm text-error-700"
+          role="alert"
+        >
           <AlertCircle className="h-4 w-4 shrink-0" />
           {error}
         </div>

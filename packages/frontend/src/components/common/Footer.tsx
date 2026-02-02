@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import { Github, Twitter } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -13,29 +13,18 @@ export function Footer() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
               <span className="text-lg font-bold text-white">Q</span>
             </div>
-            <span className="ml-2 text-lg font-semibold text-gray-900">
-              QuizGenius
-            </span>
+            <span className="ml-2 text-lg font-semibold text-gray-900">QuizGenius</span>
           </div>
 
           {/* Links */}
           <nav className="mt-4 flex justify-center gap-6 md:mt-0" aria-label="Footer navigation">
-            <Link
-              to="/privacy"
-              className="text-sm text-gray-500 hover:text-gray-900"
-            >
+            <Link to="/privacy" className="text-sm text-gray-500 hover:text-gray-900">
               Privacy Policy
             </Link>
-            <Link
-              to="/terms"
-              className="text-sm text-gray-500 hover:text-gray-900"
-            >
+            <Link to="/terms" className="text-sm text-gray-500 hover:text-gray-900">
               Terms of Service
             </Link>
-            <Link
-              to="/contact"
-              className="text-sm text-gray-500 hover:text-gray-900"
-            >
+            <Link to="/contact" className="text-sm text-gray-500 hover:text-gray-900">
               Contact
             </Link>
           </nav>
@@ -65,9 +54,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="mt-6 border-t border-gray-100 pt-6 text-center">
-          <p className="text-sm text-gray-500">
-            © {currentYear} QuizGenius. All rights reserved.
-          </p>
+          <p className="text-sm text-gray-500">© {currentYear} QuizGenius. All rights reserved.</p>
         </div>
       </div>
     </footer>

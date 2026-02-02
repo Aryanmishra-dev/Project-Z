@@ -29,7 +29,7 @@ NLP_ENV="${NLP_ENV:-development}"
 # Start uvicorn
 if [ "$NLP_ENV" = "production" ]; then
     echo "Starting NLP service in production mode..."
-    exec uvicorn main:app \
+    exec uvicorn app.main:app \
         --host "$NLP_HOST" \
         --port "$NLP_PORT" \
         --workers "$NLP_WORKERS" \
@@ -38,7 +38,7 @@ if [ "$NLP_ENV" = "production" ]; then
         --no-use-colors
 else
     echo "Starting NLP service in development mode..."
-    exec uvicorn main:app \
+    exec uvicorn app.main:app \
         --host "$NLP_HOST" \
         --port "$NLP_PORT" \
         --reload \

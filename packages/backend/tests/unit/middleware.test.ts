@@ -2,16 +2,21 @@
  * Auth middleware tests
  * Tests for authentication and authorization middleware
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Response, NextFunction } from 'express';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock environment before importing
 vi.stubEnv('JWT_SECRET', 'test-secret-key-for-jwt-testing-min-32-chars');
 vi.stubEnv('JWT_ACCESS_EXPIRES', '15m');
 vi.stubEnv('JWT_REFRESH_EXPIRES', '7d');
 
-import { authenticate, authorize, optionalAuth, AuthenticatedRequest } from '../../src/middleware/auth';
 import { generateAccessToken } from '../../src/config/jwt';
+import {
+  authenticate,
+  authorize,
+  optionalAuth,
+  AuthenticatedRequest,
+} from '../../src/middleware/auth';
 import { AuthenticationError, AuthorizationError } from '../../src/utils/errors';
 
 describe('Auth Middleware', () => {
@@ -38,11 +43,7 @@ describe('Auth Middleware', () => {
       const token = generateAccessToken(mockUser.sub, mockUser.email, mockUser.role);
       mockReq.headers = { authorization: `Bearer ${token}` };
 
-      authenticate(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      authenticate(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockReq.user).toBeDefined();
@@ -51,11 +52,7 @@ describe('Auth Middleware', () => {
     });
 
     it('should reject missing authorization header', () => {
-      authenticate(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      authenticate(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(AuthenticationError));
     });
@@ -63,11 +60,7 @@ describe('Auth Middleware', () => {
     it('should reject invalid token format', () => {
       mockReq.headers = { authorization: 'NotBearer token' };
 
-      authenticate(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      authenticate(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(AuthenticationError));
     });
@@ -75,11 +68,7 @@ describe('Auth Middleware', () => {
     it('should reject invalid token', () => {
       mockReq.headers = { authorization: 'Bearer invalid-token' };
 
-      authenticate(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      authenticate(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(AuthenticationError));
     });
@@ -87,11 +76,7 @@ describe('Auth Middleware', () => {
     it('should reject Bearer without token', () => {
       mockReq.headers = { authorization: 'Bearer' };
 
-      authenticate(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      authenticate(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(AuthenticationError));
     });
@@ -102,11 +87,7 @@ describe('Auth Middleware', () => {
       mockReq.user = { ...mockUser, type: 'access' as const, iat: 0, exp: 0 };
       const middleware = authorize('user');
 
-      middleware(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      middleware(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
     });
@@ -115,11 +96,7 @@ describe('Auth Middleware', () => {
       mockReq.user = { ...mockUser, role: 'admin', type: 'access' as const, iat: 0, exp: 0 };
       const middleware = authorize('user', 'admin');
 
-      middleware(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      middleware(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
     });
@@ -128,11 +105,7 @@ describe('Auth Middleware', () => {
       mockReq.user = { ...mockUser, type: 'access' as const, iat: 0, exp: 0 };
       const middleware = authorize('admin');
 
-      middleware(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      middleware(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(AuthorizationError));
     });
@@ -140,11 +113,7 @@ describe('Auth Middleware', () => {
     it('should reject when user not authenticated', () => {
       const middleware = authorize('user');
 
-      middleware(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      middleware(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(AuthenticationError));
     });
@@ -155,22 +124,14 @@ describe('Auth Middleware', () => {
       const token = generateAccessToken(mockUser.sub, mockUser.email, mockUser.role);
       mockReq.headers = { authorization: `Bearer ${token}` };
 
-      optionalAuth(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      optionalAuth(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockReq.user).toBeDefined();
     });
 
     it('should continue without user when no token', () => {
-      optionalAuth(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      optionalAuth(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockReq.user).toBeUndefined();
@@ -179,11 +140,7 @@ describe('Auth Middleware', () => {
     it('should continue without user for invalid token', () => {
       mockReq.headers = { authorization: 'Bearer invalid-token' };
 
-      optionalAuth(
-        mockReq as AuthenticatedRequest,
-        mockRes as Response,
-        mockNext
-      );
+      optionalAuth(mockReq as AuthenticatedRequest, mockRes as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockReq.user).toBeUndefined();

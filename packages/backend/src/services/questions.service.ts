@@ -3,9 +3,10 @@
  * Business logic for quiz questions management
  */
 import { eq, and, desc, asc, gte, sql, count, inArray } from 'drizzle-orm';
+
 import { db } from '../db';
-import { questions, type Question, type NewQuestion } from '../db/schema/questions';
 import { pdfs } from '../db/schema/pdfs';
+import { questions, type Question, type NewQuestion } from '../db/schema/questions';
 import { NotFoundError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
@@ -64,10 +65,7 @@ class QuestionsService {
    * Get a question by ID
    */
   async getById(id: string): Promise<Question | null> {
-    const [question] = await db
-      .select()
-      .from(questions)
-      .where(eq(questions.id, id));
+    const [question] = await db.select().from(questions).where(eq(questions.id, id));
 
     return question || null;
   }
@@ -100,15 +98,15 @@ class QuestionsService {
 
     // Build where conditions
     const conditions: ReturnType<typeof eq>[] = [eq(questions.pdfId, pdfId)];
-    
+
     if (difficulty) {
       conditions.push(eq(questions.difficulty, difficulty));
     }
-    
+
     if (validationStatus) {
       conditions.push(eq(questions.validationStatus, validationStatus));
     }
-    
+
     if (minQualityScore !== undefined) {
       conditions.push(gte(questions.qualityScore, minQualityScore.toString()));
     }
@@ -145,7 +143,13 @@ class QuestionsService {
    * Get random questions for a quiz
    */
   async getRandomQuestions(options: RandomQuestionsOptions): Promise<Question[]> {
-    const { pdfId, count: questionCount, difficulty, excludeIds = [], minQualityScore = 0.5 } = options;
+    const {
+      pdfId,
+      count: questionCount,
+      difficulty,
+      excludeIds = [],
+      minQualityScore = 0.5,
+    } = options;
 
     // Build where conditions
     const conditions: ReturnType<typeof eq>[] = [
@@ -160,7 +164,12 @@ class QuestionsService {
 
     // Exclude already used questions
     if (excludeIds && excludeIds.length > 0) {
-      conditions.push(sql`${questions.id} NOT IN (${sql.join(excludeIds.map(id => sql`${id}`), sql`, `)})`);
+      conditions.push(
+        sql`${questions.id} NOT IN (${sql.join(
+          excludeIds.map((id) => sql`${id}`),
+          sql`, `
+        )})`
+      );
     }
 
     // Get random questions using PostgreSQL RANDOM()
@@ -180,10 +189,7 @@ class QuestionsService {
   async getByIds(ids: string[]): Promise<Question[]> {
     if (ids.length === 0) return [];
 
-    return db
-      .select()
-      .from(questions)
-      .where(inArray(questions.id, ids));
+    return db.select().from(questions).where(inArray(questions.id, ids));
   }
 
   /**
@@ -212,10 +218,7 @@ class QuestionsService {
         count: count(),
       })
       .from(questions)
-      .where(and(
-        eq(questions.pdfId, pdfId),
-        eq(questions.validationStatus, 'valid')
-      ))
+      .where(and(eq(questions.pdfId, pdfId), eq(questions.validationStatus, 'valid')))
       .groupBy(questions.difficulty);
 
     const counts = { easy: 0, medium: 0, hard: 0 };
@@ -269,10 +272,7 @@ class QuestionsService {
         validationStatus: 'valid',
         updatedAt: new Date(),
       })
-      .where(and(
-        eq(questions.pdfId, pdfId),
-        eq(questions.validationStatus, 'pending')
-      ));
+      .where(and(eq(questions.pdfId, pdfId), eq(questions.validationStatus, 'pending')));
 
     return result.rowCount || 0;
   }
@@ -281,9 +281,7 @@ class QuestionsService {
    * Delete questions for a PDF
    */
   async deleteByPdfId(pdfId: string): Promise<number> {
-    const result = await db
-      .delete(questions)
-      .where(eq(questions.pdfId, pdfId));
+    const result = await db.delete(questions).where(eq(questions.pdfId, pdfId));
 
     logger.info('Questions deleted for PDF', { pdfId, count: result.rowCount });
     return result.rowCount || 0;

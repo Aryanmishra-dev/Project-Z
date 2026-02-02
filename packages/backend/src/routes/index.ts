@@ -3,19 +3,20 @@
  * Combines all route modules
  */
 import { Router } from 'express';
+
+import { analyticsRoutes } from './analytics.routes';
 import { authRoutes } from './auth.routes';
 import { pdfRoutes } from './pdf.routes';
 import { questionRoutes } from './questions.routes';
 import { quizSessionRoutes } from './quiz-sessions.routes';
-import { analyticsRoutes } from './analytics.routes';
 import { settingsRoutes } from './settings.routes';
 import { authController } from '../controllers';
-import { apiRateLimiter } from '../middleware';
+// import { apiRateLimiter } from '../middleware';
 
 const router = Router();
 
-// Apply API rate limiter to all routes
-router.use(apiRateLimiter);
+// Apply API rate limiter to all routes - DISABLED for development
+// router.use(apiRateLimiter);
 
 /**
  * @swagger

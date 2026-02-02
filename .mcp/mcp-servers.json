@@ -9,9 +9,7 @@
     },
     "filesystem": {
       "command": "mcp-server-filesystem",
-      "args": [
-        "/Users/theogengineer/Desktop/Project-Z"
-      ]
+      "args": ["/Users/theogengineer/Desktop/Project-Z"]
     },
     "memory": {
       "command": "mcp-server-memory",

@@ -2,8 +2,8 @@
  * Winston logger configuration
  * Provides structured JSON logging with request tracing
  */
-import winston from 'winston';
 import { v4 as uuidv4 } from 'uuid';
+import winston from 'winston';
 
 /**
  * Log levels in order of priority
@@ -35,7 +35,7 @@ winston.addColors(logColors);
 const level = (): string => {
   const env = process.env.NODE_ENV || 'development';
   const configLevel = process.env.LOG_LEVEL;
-  
+
   if (configLevel) return configLevel;
   return env === 'development' ? 'debug' : 'info';
 };
@@ -76,7 +76,7 @@ transports.push(
 // Add file transports in production
 if (process.env.NODE_ENV === 'production') {
   const logPath = process.env.LOG_FILE_PATH || './logs';
-  
+
   transports.push(
     new winston.transports.File({
       filename: `${logPath}/error.log`,

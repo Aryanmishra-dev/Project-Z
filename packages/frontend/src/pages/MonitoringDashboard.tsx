@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Activity,
@@ -10,12 +9,14 @@ import {
   XCircle,
   RefreshCw,
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import * as React from 'react';
+
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { cn } from '@/utils/cn';
 import { api } from '@/lib/api';
+import { cn } from '@/utils/cn';
 
 interface HealthData {
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -160,9 +161,7 @@ const AlertItem: React.FC<{ alert: Alert }> = ({ alert }) => {
   const config = severityConfig[alert.severity];
 
   return (
-    <div
-      className={cn('p-4 rounded-lg border', config.bgColor, config.borderColor)}
-    >
+    <div className={cn('p-4 rounded-lg border', config.bgColor, config.borderColor)}>
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
@@ -171,8 +170,8 @@ const AlertItem: React.FC<{ alert: Alert }> = ({ alert }) => {
                 alert.severity === 'critical'
                   ? 'error'
                   : alert.severity === 'warning'
-                  ? 'warning'
-                  : 'default'
+                    ? 'warning'
+                    : 'default'
               }
             >
               {alert.severity.toUpperCase()}

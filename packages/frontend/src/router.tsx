@@ -1,8 +1,9 @@
 import { createBrowserRouter, type RouterProviderProps } from 'react-router-dom';
 import type { RouteObject } from 'react-router-dom';
-import { RootLayout, AppLayout } from '@/layouts';
-import { AuthLayout } from '@/components/features/auth';
+
 import { ProtectedRoute } from '@/components/common';
+import { AuthLayout } from '@/components/features/auth';
+import { RootLayout, AppLayout } from '@/layouts';
 import {
   HomePage,
   LoginPage,

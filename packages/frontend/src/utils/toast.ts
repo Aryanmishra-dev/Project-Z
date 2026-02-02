@@ -39,7 +39,7 @@ function createToast(type: ToastType, message: string | ToastOptions): Toast {
   };
 
   // Notify all listeners
-  listeners.forEach(listener => listener(toast));
+  listeners.forEach((listener) => listener(toast));
 
   return toast;
 }

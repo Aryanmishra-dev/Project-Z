@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import type { PDFStatus, ProcessingStep, UploadProgress } from '@/types';
 
 interface PDFFilters {
@@ -46,8 +47,7 @@ export const usePDFStore = create<PDFStore>((set) => ({
       currentPage: 1,
     }),
 
-  setCurrentPage: (page) =>
-    set({ currentPage: page }),
+  setCurrentPage: (page) => set({ currentPage: page }),
 
   updateProgress: (pdfId, progress, step, message) =>
     set((state) => ({

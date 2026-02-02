@@ -1,8 +1,9 @@
 import { AlertTriangle, BookOpen, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button } from '@/components/ui';
 import { WeakAreasData } from '@/services/analytics.service';
 import { cn } from '@/utils/cn';
-import { useNavigate } from 'react-router-dom';
 
 interface WeakAreasTableProps {
   data: WeakAreasData;
@@ -17,7 +18,12 @@ const DifficultyBadge = ({ difficulty }: { difficulty: string }) => {
   };
 
   return (
-    <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium capitalize', colors[difficulty as keyof typeof colors] || 'bg-gray-100 text-gray-700')}>
+    <span
+      className={cn(
+        'rounded-full px-2 py-0.5 text-xs font-medium capitalize',
+        colors[difficulty as keyof typeof colors] || 'bg-gray-100 text-gray-700'
+      )}
+    >
       {difficulty}
     </span>
   );
@@ -81,7 +87,9 @@ export function WeakAreasTable({ data, isLoading }: WeakAreasTableProps) {
         {/* Weak Difficulties */}
         {data.weakDifficulties.length > 0 && (
           <div className="rounded-lg bg-red-50 p-4">
-            <h4 className="text-sm font-medium text-red-800">Struggling with these difficulty levels:</h4>
+            <h4 className="text-sm font-medium text-red-800">
+              Struggling with these difficulty levels:
+            </h4>
             <div className="mt-2 flex flex-wrap gap-2">
               {data.weakDifficulties.map((diff) => (
                 <DifficultyBadge key={diff} difficulty={diff} />
@@ -137,7 +145,8 @@ export function WeakAreasTable({ data, isLoading }: WeakAreasTableProps) {
                     <div>
                       <p className="text-sm font-medium text-gray-700">{pdf.filename}</p>
                       <p className="text-xs text-gray-500">
-                        {pdf.weakQuestionCount} weak questions • {pdf.avgAccuracy.toFixed(0)}% accuracy
+                        {pdf.weakQuestionCount} weak questions • {pdf.avgAccuracy.toFixed(0)}%
+                        accuracy
                       </p>
                     </div>
                   </div>

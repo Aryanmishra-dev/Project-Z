@@ -2,8 +2,10 @@
  * JWT configuration and utilities
  * Handles token generation, verification, and rotation
  */
-import jwt, { SignOptions, JwtPayload } from 'jsonwebtoken';
 import crypto from 'crypto';
+
+import jwt, { SignOptions, JwtPayload } from 'jsonwebtoken';
+
 import { logger } from '../utils/logger';
 
 /**
@@ -12,22 +14,22 @@ import { logger } from '../utils/logger';
 export const jwtConfig = {
   /** Secret for signing access tokens */
   accessSecret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production',
-  
+
   /** Secret for signing refresh tokens */
   refreshSecret: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-change-in-production',
-  
+
   /** Access token expiry (default: 15 minutes) */
   accessExpiresIn: (process.env.JWT_EXPIRES_IN || '15m') as string,
-  
+
   /** Refresh token expiry (default: 7 days) */
   refreshExpiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as string,
-  
+
   /** Token issuer */
   issuer: 'pdf-quiz-generator',
-  
+
   /** Token audience */
   audience: 'pdf-quiz-generator-api',
-  
+
   /** Algorithm for signing */
   algorithm: 'HS256' as const,
 };
@@ -45,13 +47,13 @@ function generateUUID(): string {
 export interface AccessTokenPayload extends JwtPayload {
   /** User ID (subject) */
   sub: string;
-  
+
   /** User email */
   email: string;
-  
+
   /** User role */
   role: 'user' | 'admin';
-  
+
   /** Token type identifier */
   type: 'access';
 }
@@ -62,13 +64,13 @@ export interface AccessTokenPayload extends JwtPayload {
 export interface RefreshTokenPayload extends JwtPayload {
   /** User ID (subject) */
   sub: string;
-  
+
   /** JWT ID for tracking/revocation */
   jti: string;
-  
+
   /** Device identifier */
   deviceId: string;
-  
+
   /** Token type identifier */
   type: 'refresh';
 }
@@ -90,11 +92,7 @@ export interface TokenPair {
  * @param role User role
  * @returns Signed access token
  */
-export function generateAccessToken(
-  userId: string,
-  email: string,
-  role: 'user' | 'admin'
-): string {
+export function generateAccessToken(userId: string, email: string, role: 'user' | 'admin'): string {
   const payload: Omit<AccessTokenPayload, 'iat' | 'exp'> = {
     sub: userId,
     email,
@@ -109,7 +107,7 @@ export function generateAccessToken(
     algorithm: jwtConfig.algorithm,
   };
 
-  return jwt.sign(payload, jwtConfig.accessSecret, options)
+  return jwt.sign(payload, jwtConfig.accessSecret, options);
 }
 
 /**
@@ -123,7 +121,7 @@ export function generateRefreshToken(
   deviceId: string
 ): { token: string; jti: string } {
   const jti = generateUUID();
-  
+
   const payload: Omit<RefreshTokenPayload, 'iat' | 'exp'> = {
     sub: userId,
     jti,
@@ -158,10 +156,10 @@ export function generateTokenPair(
 ): TokenPair & { jti: string } {
   const accessToken = generateAccessToken(userId, email, role);
   const { token: refreshToken, jti } = generateRefreshToken(userId, deviceId);
-  
+
   // Calculate expiry in seconds
   const expiresIn = parseExpiry(jwtConfig.accessExpiresIn);
-  
+
   return {
     accessToken,
     refreshToken,
@@ -194,8 +192,8 @@ export function verifyAccessToken(token: string): AccessTokenPayload | null {
     if (error instanceof jwt.TokenExpiredError) {
       logger.debug('Access token expired');
     } else if (error instanceof jwt.JsonWebTokenError) {
-      logger.warn('Invalid access token', { 
-        error: error.message 
+      logger.warn('Invalid access token', {
+        error: error.message,
       });
     }
     return null;
@@ -225,8 +223,8 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
     if (error instanceof jwt.TokenExpiredError) {
       logger.debug('Refresh token expired');
     } else if (error instanceof jwt.JsonWebTokenError) {
-      logger.warn('Invalid refresh token', { 
-        error: error.message 
+      logger.warn('Invalid refresh token', {
+        error: error.message,
       });
     }
     return null;
@@ -249,11 +247,16 @@ export function parseExpiry(expiry: string): number {
   const unit = match[2];
 
   switch (unit) {
-    case 's': return value;
-    case 'm': return value * 60;
-    case 'h': return value * 60 * 60;
-    case 'd': return value * 60 * 60 * 24;
-    default: return 900;
+    case 's':
+      return value;
+    case 'm':
+      return value * 60;
+    case 'h':
+      return value * 60 * 60;
+    case 'd':
+      return value * 60 * 60 * 24;
+    default:
+      return 900;
   }
 }
 

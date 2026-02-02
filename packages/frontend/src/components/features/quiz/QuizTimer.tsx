@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+
 import { cn } from '@/utils/cn';
 import { formatTimer } from '@/utils/formatters';
 
@@ -53,11 +54,7 @@ export function QuizTimer({
       aria-live="polite"
       aria-label={`Time remaining: ${formatTimer(seconds)}`}
     >
-      {isCritical ? (
-        <AlertTriangle className="h-4 w-4" />
-      ) : (
-        <Clock className="h-4 w-4" />
-      )}
+      {isCritical ? <AlertTriangle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
       {formatTimer(seconds)}
     </div>
   );

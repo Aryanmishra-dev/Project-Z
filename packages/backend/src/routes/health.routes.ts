@@ -1,7 +1,8 @@
-import { Router, Request, Response } from 'express';
-import { db } from '../db';
-import { redis } from '../config/redis';
 import { sql } from 'drizzle-orm';
+import { Router, Request, Response } from 'express';
+
+import { redis } from '../config/redis';
+import { db } from '../db';
 
 const router = Router();
 
@@ -59,14 +60,17 @@ let requestMetrics = {
 };
 
 // Reset metrics every hour
-setInterval(() => {
-  requestMetrics = {
-    total: 0,
-    success: 0,
-    error: 0,
-    responseTimes: [],
-  };
-}, 60 * 60 * 1000);
+setInterval(
+  () => {
+    requestMetrics = {
+      total: 0,
+      success: 0,
+      error: 0,
+      responseTimes: [],
+    };
+  },
+  60 * 60 * 1000
+);
 
 // Track request metrics
 export const trackRequest = (statusCode: number, responseTime: number) => {
@@ -76,7 +80,7 @@ export const trackRequest = (statusCode: number, responseTime: number) => {
   } else {
     requestMetrics.error++;
   }
-  
+
   // Keep last 1000 response times for percentile calculations
   requestMetrics.responseTimes.push(responseTime);
   if (requestMetrics.responseTimes.length > 1000) {
@@ -132,17 +136,17 @@ async function checkRedis(): Promise<ServiceStatus> {
 async function checkNlpService(): Promise<ServiceStatus> {
   const start = Date.now();
   const nlpUrl = process.env.NLP_SERVICE_URL || 'http://localhost:8000';
-  
+
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-    
+    const timeout = setTimeout(() => controller.abort(), 2000);
+
     const response = await fetch(`${nlpUrl}/health`, {
       signal: controller.signal,
     });
-    
+
     clearTimeout(timeout);
-    
+
     if (response.ok) {
       return {
         status: 'healthy',
@@ -156,10 +160,11 @@ async function checkNlpService(): Promise<ServiceStatus> {
       };
     }
   } catch (error) {
+    // NLP service is optional, so don't fail if it's down
     return {
       status: 'unhealthy',
       latency: Date.now() - start,
-      message: error instanceof Error ? error.message : 'NLP service unreachable',
+      message: 'NLP service offline (optional)',
     };
   }
 }
@@ -168,7 +173,7 @@ async function checkNlpService(): Promise<ServiceStatus> {
 function getSystemMetrics(): SystemMetrics {
   const memUsage = process.memoryUsage();
   const cpuUsage = process.cpuUsage();
-  
+
   return {
     memory: {
       heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024),
@@ -185,14 +190,19 @@ function getSystemMetrics(): SystemMetrics {
       total: requestMetrics.total,
       success: requestMetrics.success,
       error: requestMetrics.error,
-      errorRate: requestMetrics.total > 0
-        ? Math.round((requestMetrics.error / requestMetrics.total) * 10000) / 100
-        : 0,
+      errorRate:
+        requestMetrics.total > 0
+          ? Math.round((requestMetrics.error / requestMetrics.total) * 10000) / 100
+          : 0,
     },
     responseTime: {
-      avg: requestMetrics.responseTimes.length > 0
-        ? Math.round(requestMetrics.responseTimes.reduce((a, b) => a + b, 0) / requestMetrics.responseTimes.length)
-        : 0,
+      avg:
+        requestMetrics.responseTimes.length > 0
+          ? Math.round(
+              requestMetrics.responseTimes.reduce((a, b) => a + b, 0) /
+                requestMetrics.responseTimes.length
+            )
+          : 0,
       p50: percentile(requestMetrics.responseTimes, 50),
       p95: percentile(requestMetrics.responseTimes, 95),
       p99: percentile(requestMetrics.responseTimes, 99),
@@ -207,11 +217,11 @@ router.get('/health', async (_req: Request, res: Response) => {
     checkRedis(),
     checkNlpService(),
   ]);
-  
+
   const anyUnhealthy = database.status === 'unhealthy' || redisStatus.status === 'unhealthy';
-  
+
   const healthStatus: HealthStatus = {
-    status: anyUnhealthy ? 'unhealthy' : (nlp.status === 'unhealthy' ? 'degraded' : 'healthy'),
+    status: anyUnhealthy ? 'unhealthy' : nlp.status === 'unhealthy' ? 'degraded' : 'healthy',
     timestamp: new Date().toISOString(),
     uptime: Math.round(process.uptime()),
     version: process.env.npm_package_version || '1.0.0',
@@ -222,7 +232,7 @@ router.get('/health', async (_req: Request, res: Response) => {
     },
     metrics: getSystemMetrics(),
   };
-  
+
   const statusCode = healthStatus.status === 'unhealthy' ? 503 : 200;
   res.status(statusCode).json(healthStatus);
 });
@@ -234,11 +244,8 @@ router.get('/live', (_req: Request, res: Response) => {
 
 // Readiness probe (checks dependencies)
 router.get('/ready', async (_req: Request, res: Response) => {
-  const [database, redisStatus] = await Promise.all([
-    checkDatabase(),
-    checkRedis(),
-  ]);
-  
+  const [database, redisStatus] = await Promise.all([checkDatabase(), checkRedis()]);
+
   if (database.status === 'healthy' && redisStatus.status === 'healthy') {
     res.status(200).json({ status: 'ready', timestamp: new Date().toISOString() });
   } else {
@@ -257,7 +264,7 @@ router.get('/ready', async (_req: Request, res: Response) => {
 router.get('/metrics', async (_req: Request, res: Response) => {
   const metrics = getSystemMetrics();
   const uptime = process.uptime();
-  
+
   const prometheusMetrics = `
 # HELP pdfquiz_uptime_seconds Application uptime in seconds
 # TYPE pdfquiz_uptime_seconds gauge

@@ -1,6 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useMediaQuery, useBreakpoint, useIsMobile, useIsTablet, useIsDesktop } from '../useMediaQuery';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+import {
+  useMediaQuery,
+  useBreakpoint,
+  useIsMobile,
+  useIsTablet,
+  useIsDesktop,
+} from '../useMediaQuery';
 
 describe('useMediaQuery', () => {
   const matchMediaMock = vi.fn();

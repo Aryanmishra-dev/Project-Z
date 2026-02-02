@@ -42,18 +42,22 @@ Welcome to the PDF Quiz Generator! This guide will help you get started with cre
 After logging in, you'll see your personalized dashboard with:
 
 ### Quick Stats
+
 - **Total Quizzes**: Number of quizzes you've taken
 - **Average Score**: Your overall performance percentage
 - **Study Streak**: Consecutive days of quiz activity
 - **PDFs Uploaded**: Total documents in your library
 
 ### Recent Activity
+
 A list of your latest quiz sessions with scores and completion dates.
 
 ### Performance Chart
+
 Visual representation of your quiz scores over time.
 
 ### Quick Actions
+
 - **Upload PDF**: Add a new document
 - **Start Quiz**: Begin a new quiz session
 - **View Analytics**: See detailed performance metrics
@@ -63,6 +67,7 @@ Visual representation of your quiz scores over time.
 ## Uploading PDFs
 
 ### Supported Formats
+
 - PDF files (`.pdf`)
 - Maximum file size: 50 MB
 - Maximum pages: 500 (configurable)
@@ -77,6 +82,7 @@ Visual representation of your quiz scores over time.
 4. The PDF will appear in your library
 
 ### Processing Status
+
 - **Uploading**: File is being transferred
 - **Processing**: AI is analyzing the document
 - **Ready**: Quiz questions are generated and ready
@@ -105,22 +111,26 @@ Visual representation of your quiz scores over time.
 ### During the Quiz
 
 #### Question Navigation
+
 - Use **Previous** and **Next** buttons to move between questions
 - Click question numbers in the progress bar to jump to specific questions
 - Answered questions are highlighted in green
 
 #### Answering Questions
+
 1. Read the question carefully
 2. Click on your chosen answer (A, B, C, or D)
 3. Your answer is automatically saved
 4. Move to the next question
 
 #### Timer (if enabled)
+
 - A countdown timer shows remaining time
 - Warning appears at 10 seconds remaining
 - Quiz auto-submits when time runs out
 
 #### Keyboard Shortcuts
+
 - `A`, `B`, `C`, `D`: Select answer
 - `←` / `→`: Navigate questions
 - `Enter`: Submit quiz (on last question)
@@ -134,6 +144,7 @@ Visual representation of your quiz scores over time.
 ### Quiz Results
 
 After submission, you'll see:
+
 - **Score**: Percentage and fraction (e.g., 80% - 8/10)
 - **Time Taken**: Total duration
 - **Performance Rating**: Based on your score
@@ -149,25 +160,33 @@ After submission, you'll see:
 Navigate to **Analytics** to see:
 
 #### Score Trends
+
 Line chart showing your quiz scores over time with:
+
 - 7-day, 30-day, and 90-day views
 - Average score line
 - Best and worst performance markers
 
 #### Weak Areas
+
 Identifies topics where you need improvement:
+
 - Topics are extracted from your quiz questions
 - Shows percentage of questions answered incorrectly
 - Click a topic to see related questions
 
 #### Study Patterns
+
 Discover when you perform best:
+
 - Time of day analysis (morning, afternoon, evening)
 - Day of week performance
 - Optimal study session duration
 
 #### Streaks and Achievements
+
 Track your consistency:
+
 - Current streak
 - Longest streak
 - Total quizzes this month
@@ -176,6 +195,7 @@ Track your consistency:
 ### Exporting Data
 
 Click **Export** to download:
+
 - Quiz history (CSV)
 - Performance report (PDF)
 - Analytics summary (JSON)
@@ -187,6 +207,7 @@ Click **Export** to download:
 ### Profile Settings
 
 Navigate to **Settings > Profile** to:
+
 - Update your username
 - Change your email
 - Upload a profile picture
@@ -194,6 +215,7 @@ Navigate to **Settings > Profile** to:
 ### Password & Security
 
 Navigate to **Settings > Security** to:
+
 - Change your password
 - View active sessions
 - Enable two-factor authentication (if available)
@@ -202,6 +224,7 @@ Navigate to **Settings > Security** to:
 ### Notification Preferences
 
 Customize alerts for:
+
 - Daily study reminders
 - Weekly progress reports
 - Achievement notifications
@@ -215,16 +238,16 @@ Customize alerts for:
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl/Cmd + K` | Open command palette |
+| Shortcut           | Action                             |
+| ------------------ | ---------------------------------- |
+| `Ctrl/Cmd + K`     | Open command palette               |
 | `A`, `B`, `C`, `D` | Select answer option (during quiz) |
-| `←` | Previous question |
-| `→` | Next question |
-| `Enter` | Submit quiz |
-| `Escape` | Close modal/dialog |
-| `Ctrl/Cmd + U` | Upload PDF |
-| `Ctrl/Cmd + N` | Start new quiz |
+| `←`                | Previous question                  |
+| `→`                | Next question                      |
+| `Enter`            | Submit quiz                        |
+| `Escape`           | Close modal/dialog                 |
+| `Ctrl/Cmd + U`     | Upload PDF                         |
+| `Ctrl/Cmd + N`     | Start new quiz                     |
 
 ---
 
@@ -233,12 +256,14 @@ Customize alerts for:
 ### PDF Upload Issues
 
 **Problem**: Upload fails or takes too long
+
 - Check your internet connection
 - Ensure the file is under 50 MB
 - Try a different PDF file
 - Clear browser cache and retry
 
 **Problem**: "Processing failed" error
+
 - The PDF might be image-based (scanned document)
 - The PDF might be password-protected
 - Try re-exporting the PDF from the original source
@@ -246,10 +271,12 @@ Customize alerts for:
 ### Quiz Issues
 
 **Problem**: Questions seem incorrect
+
 - Click **Report Question** to flag it for review
 - Questions are AI-generated and may occasionally have errors
 
 **Problem**: Quiz won't submit
+
 - Check your internet connection
 - Ensure all questions are answered
 - Try refreshing the page (progress is saved)
@@ -257,6 +284,7 @@ Customize alerts for:
 ### Performance Issues
 
 **Problem**: App is slow
+
 - Clear browser cache
 - Disable browser extensions
 - Try a different browser (Chrome or Firefox recommended)
@@ -265,12 +293,14 @@ Customize alerts for:
 ### Account Issues
 
 **Problem**: Can't log in
+
 - Click "Forgot Password" to reset
 - Check your email spam folder
 - Ensure caps lock is off
 - Try a different browser
 
 **Problem**: Not receiving emails
+
 - Check spam/junk folder
 - Add our email to your contacts
 - Contact support if issues persist
@@ -280,15 +310,18 @@ Customize alerts for:
 ## Getting Help
 
 ### Contact Support
+
 - Email: support@pdfquizgen.com
 - In-app: Click **Help** > **Contact Support**
 
 ### Report a Bug
+
 - Use the **Help** > **Report Bug** feature
 - Include steps to reproduce the issue
 - Attach screenshots if helpful
 
 ### Feature Requests
+
 - Submit ideas through **Help** > **Feature Request**
 - Vote on existing requests in our feedback portal
 
@@ -297,20 +330,25 @@ Customize alerts for:
 ## Frequently Asked Questions
 
 ### How are questions generated?
+
 Our AI analyzes your PDF content and creates relevant multiple-choice questions using advanced natural language processing.
 
 ### Are my PDFs secure?
+
 Yes! All uploads are encrypted in transit and at rest. We never share your documents with third parties.
 
 ### Can I use the app offline?
+
 Currently, an internet connection is required. Offline mode is planned for future releases.
 
 ### Is there a mobile app?
+
 The web app is fully responsive and works on mobile browsers. Native apps are in development.
 
 ### How do I cancel my subscription?
+
 Free tier users don't need to cancel. Premium users can cancel anytime in **Settings > Billing**.
 
 ---
 
-*Last updated: January 2025*
+_Last updated: January 2025_

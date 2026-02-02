@@ -3,6 +3,13 @@
  * Handles token storage, validation, and rotation in Redis
  */
 import {
+  generateTokenPair,
+  verifyRefreshToken,
+  getRefreshTokenExpirySeconds,
+  type TokenPair,
+  type RefreshTokenPayload,
+} from '../config/jwt';
+import {
   redis,
   buildRedisKey,
   REDIS_KEYS,
@@ -11,13 +18,6 @@ import {
   deleteAllUserSessions,
   type SessionData,
 } from '../config/redis';
-import {
-  generateTokenPair,
-  verifyRefreshToken,
-  getRefreshTokenExpirySeconds,
-  type TokenPair,
-  type RefreshTokenPayload,
-} from '../config/jwt';
 import { logger } from '../utils/logger';
 
 /**
@@ -45,7 +45,7 @@ export function generateDeviceId(userAgent: string, ipAddress: string): string {
   let hash = 0;
   for (let i = 0; i < data.length; i++) {
     const char = data.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
   return `device_${Math.abs(hash).toString(16)}`;
@@ -90,7 +90,7 @@ export async function issueTokens(
     createdAt: now.toISOString(),
     expiresAt: expiresAt.toISOString(),
   };
-  
+
   await redis.setex(refreshTokenKey, ttlSeconds, JSON.stringify(tokenData));
 
   // Store session data
@@ -103,7 +103,7 @@ export async function issueTokens(
     lastActiveAt: now.toISOString(),
     expiresAt: expiresAt.toISOString(),
   };
-  
+
   await storeSession(userId, deviceId, sessionData, ttlSeconds);
 
   logger.info('Tokens issued successfully', { userId, deviceId });
@@ -134,7 +134,7 @@ export async function verifyStoredRefreshToken(
   // Check if token exists in Redis (not revoked)
   const refreshTokenKey = buildRedisKey(REDIS_KEYS.REFRESH_TOKEN, payload.sub, payload.jti);
   const storedData = await redis.get(refreshTokenKey);
-  
+
   if (!storedData) {
     logger.warn('Refresh token not found in Redis (possibly revoked)', {
       userId: payload.sub,
@@ -185,9 +185,9 @@ export async function rotateRefreshToken(
   const oldTokenKey = buildRedisKey(REDIS_KEYS.REFRESH_TOKEN, payload.sub, payload.jti);
   await redis.del(oldTokenKey);
 
-  logger.info('Old refresh token invalidated', { 
-    userId: payload.sub, 
-    jti: payload.jti 
+  logger.info('Old refresh token invalidated', {
+    userId: payload.sub,
+    jti: payload.jti,
   });
 
   // Issue new token pair
@@ -220,7 +220,7 @@ export async function revokeAllUserTokens(userId: string): Promise<void> {
   // Find all refresh tokens for user
   const pattern = buildRedisKey(REDIS_KEYS.REFRESH_TOKEN, userId, '*');
   const keys = await redis.keys(pattern);
-  
+
   if (keys.length > 0) {
     await redis.del(...keys);
   }

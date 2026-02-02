@@ -1,13 +1,11 @@
+import { useMutation } from '@tanstack/react-query';
+import { ChevronLeft, ChevronRight, Flag, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Flag,
-  AlertTriangle,
-  CheckCircle,
-} from 'lucide-react';
+
+import { QuestionCard } from './QuestionCard';
+import { QuizTimer } from './QuizTimer';
+
 import {
   Button,
   Progress,
@@ -18,8 +16,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui';
-import { QuestionCard } from './QuestionCard';
-import { QuizTimer } from './QuizTimer';
 import { quizService } from '@/services';
 import {
   useQuizStore,
@@ -28,9 +24,9 @@ import {
   selectIsLastQuestion,
   selectIsFirstQuestion,
 } from '@/stores/quizStore';
-import { ROUTES } from '@/utils/constants';
-import { cn } from '@/utils/cn';
 import type { QuizSessionWithDetails } from '@/types';
+import { cn } from '@/utils/cn';
+import { ROUTES } from '@/utils/constants';
 
 interface QuizInterfaceProps {
   session: QuizSessionWithDetails;
@@ -146,27 +142,16 @@ export function QuizInterface({ session }: QuizInterfaceProps) {
 
           <div className="flex items-center gap-4">
             {timeRemaining !== null && (
-              <QuizTimer
-                seconds={timeRemaining}
-                onTick={handleTimerTick}
-              />
+              <QuizTimer seconds={timeRemaining} onTick={handleTimerTick} />
             )}
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setShowSubmitDialog(true)}
-            >
+            <Button variant="primary" size="sm" onClick={() => setShowSubmitDialog(true)}>
               Submit Quiz
             </Button>
           </div>
         </div>
 
         {/* Progress bar */}
-        <Progress
-          value={progress.percentage}
-          max={100}
-          className="h-1 rounded-none"
-        />
+        <Progress value={progress.percentage} max={100} className="h-1 rounded-none" />
       </header>
 
       {/* Main content */}
@@ -184,11 +169,7 @@ export function QuizInterface({ session }: QuizInterfaceProps) {
 
             {/* Navigation */}
             <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
-              <Button
-                variant="outline"
-                onClick={previousQuestion}
-                disabled={isFirstQuestion}
-              >
+              <Button variant="outline" onClick={previousQuestion} disabled={isFirstQuestion}>
                 <ChevronLeft className="mr-1 h-4 w-4" />
                 Previous
               </Button>
@@ -197,9 +178,7 @@ export function QuizInterface({ session }: QuizInterfaceProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => toggleMarkForReview(currentQuestion.id)}
-                className={cn(
-                  markedForReview.has(currentQuestion.id) && 'text-warning-600'
-                )}
+                className={cn(markedForReview.has(currentQuestion.id) && 'text-warning-600')}
               >
                 <Flag className="mr-1 h-4 w-4" />
                 {markedForReview.has(currentQuestion.id) ? 'Marked' : 'Mark for review'}

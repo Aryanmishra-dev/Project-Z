@@ -3,6 +3,7 @@
  * Tests for custom error classes
  */
 import { describe, it, expect } from 'vitest';
+
 import {
   AppError,
   ValidationError,
@@ -20,7 +21,7 @@ describe('Error Classes', () => {
   describe('AppError', () => {
     it('should create error with correct properties', () => {
       const error = new AppError('Test error', 400, 'TEST_ERROR');
-      
+
       expect(error.message).toBe('Test error');
       expect(error.statusCode).toBe(400);
       expect(error.code).toBe('TEST_ERROR');
@@ -30,7 +31,7 @@ describe('Error Classes', () => {
     it('should support details', () => {
       const details = { field: 'email', reason: 'invalid' };
       const error = new AppError('Test error', 400, 'TEST_ERROR', true, details);
-      
+
       expect(error.details).toEqual(details);
     });
 
@@ -47,7 +48,7 @@ describe('Error Classes', () => {
         password: ['Too short', 'Needs uppercase'],
       };
       const error = new ValidationError('Validation failed', fieldErrors);
-      
+
       expect(error.statusCode).toBe(400);
       expect(error.code).toBe('VALIDATION_ERROR');
       expect(error.fieldErrors).toEqual(fieldErrors);
@@ -55,7 +56,7 @@ describe('Error Classes', () => {
 
     it('should work without field errors', () => {
       const error = new ValidationError('Invalid input');
-      
+
       expect(error.statusCode).toBe(400);
       expect(error.fieldErrors).toEqual({});
     });
@@ -64,7 +65,7 @@ describe('Error Classes', () => {
   describe('AuthenticationError', () => {
     it('should have correct status code', () => {
       const error = new AuthenticationError('Invalid token');
-      
+
       expect(error.statusCode).toBe(401);
       expect(error.code).toBe('AUTHENTICATION_ERROR');
     });
@@ -78,7 +79,7 @@ describe('Error Classes', () => {
   describe('AuthorizationError', () => {
     it('should have correct status code', () => {
       const error = new AuthorizationError('Insufficient permissions');
-      
+
       expect(error.statusCode).toBe(403);
       expect(error.code).toBe('AUTHORIZATION_ERROR');
     });
@@ -92,7 +93,7 @@ describe('Error Classes', () => {
   describe('NotFoundError', () => {
     it('should have correct status code', () => {
       const error = new NotFoundError('User');
-      
+
       expect(error.statusCode).toBe(404);
       expect(error.code).toBe('NOT_FOUND');
       expect(error.message).toBe('User not found');
@@ -102,7 +103,7 @@ describe('Error Classes', () => {
   describe('ConflictError', () => {
     it('should have correct status code', () => {
       const error = new ConflictError('Email already exists');
-      
+
       expect(error.statusCode).toBe(409);
       expect(error.code).toBe('CONFLICT');
     });
@@ -111,7 +112,7 @@ describe('Error Classes', () => {
   describe('RateLimitError', () => {
     it('should have correct status code and retryAfter', () => {
       const error = new RateLimitError(60);
-      
+
       expect(error.statusCode).toBe(429);
       expect(error.code).toBe('RATE_LIMIT_EXCEEDED');
       expect(error.retryAfter).toBe(60);
@@ -122,7 +123,7 @@ describe('Error Classes', () => {
   describe('InternalError', () => {
     it('should have correct status code', () => {
       const error = new InternalError('Database error');
-      
+
       expect(error.statusCode).toBe(500);
       expect(error.code).toBe('INTERNAL_ERROR');
     });
@@ -136,7 +137,7 @@ describe('Error Classes', () => {
   describe('ServiceUnavailableError', () => {
     it('should have correct status code', () => {
       const error = new ServiceUnavailableError('Redis');
-      
+
       expect(error.statusCode).toBe(503);
       expect(error.code).toBe('SERVICE_UNAVAILABLE');
       expect(error.message).toBe('Redis is currently unavailable');

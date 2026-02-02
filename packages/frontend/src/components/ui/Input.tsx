@@ -1,5 +1,6 @@
-import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
+import * as React from 'react';
+
 import { cn } from '@/utils/cn';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -9,11 +10,11 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, error, hint, id, ...props }, ref) => {
+  ({ className, type = 'text', label, error, hint, id, required, ...props }, ref) => {
     const inputId = id || React.useId();
     const errorId = error ? `${inputId}-error` : undefined;
     const hintId = hint ? `${inputId}-hint` : undefined;
-    
+
     const describedBy = [errorId, hintId].filter(Boolean).join(' ') || undefined;
 
     return (
@@ -24,6 +25,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className="block text-sm font-medium text-gray-700"
           >
             {label}
+            {required && <span className="ml-1 text-error-500">*</span>}
           </LabelPrimitive.Root>
         )}
         <input
@@ -40,6 +42,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className
           )}
           ref={ref}
+          required={required}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={describedBy}
           {...props}

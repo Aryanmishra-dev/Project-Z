@@ -2,16 +2,17 @@
  * User Settings Service
  * Profile management, security, and preferences
  */
+import { hash, verify } from 'argon2';
+import { eq, and, ne, sql, desc, isNull, count } from 'drizzle-orm';
+
+import { redis } from '../config/redis';
 import { db } from '../db';
-import { users } from '../db/schema/users';
-import { refreshTokens } from '../db/schema/refresh-tokens';
-import { quizSessions } from '../db/schema/quiz-sessions';
-import { userAnswers } from '../db/schema/user-answers';
 import { pdfs } from '../db/schema/pdfs';
 import { questions } from '../db/schema/questions';
-import { eq, and, ne, sql, desc, isNull, count } from 'drizzle-orm';
-import { hash, verify } from 'argon2';
-import { redis } from '../config/redis';
+import { quizSessions } from '../db/schema/quiz-sessions';
+import { refreshTokens } from '../db/schema/refresh-tokens';
+import { userAnswers } from '../db/schema/user-answers';
+import { users } from '../db/schema/users';
 import { logger } from '../utils/logger';
 
 /**
@@ -202,9 +203,7 @@ class UserSettingsService {
       .where(eq(users.id, userId));
 
     // Invalidate all refresh tokens for security
-    await db
-      .delete(refreshTokens)
-      .where(eq(refreshTokens.userId, userId));
+    await db.delete(refreshTokens).where(eq(refreshTokens.userId, userId));
 
     logger.info('Password changed', { userId });
     return { success: true };
@@ -249,12 +248,7 @@ class UserSettingsService {
     const result = await db
       .update(refreshTokens)
       .set({ revokedAt: new Date() })
-      .where(
-        and(
-          eq(refreshTokens.id, sessionId),
-          eq(refreshTokens.userId, userId)
-        )
-      );
+      .where(and(eq(refreshTokens.id, sessionId), eq(refreshTokens.userId, userId)));
 
     logger.info('Session revoked', { userId, sessionId });
     return { success: true };
@@ -268,16 +262,9 @@ class UserSettingsService {
       await db
         .update(refreshTokens)
         .set({ revokedAt: new Date() })
-        .where(
-          and(
-            eq(refreshTokens.userId, userId),
-            ne(refreshTokens.id, currentTokenId)
-          )
-        );
+        .where(and(eq(refreshTokens.userId, userId), ne(refreshTokens.id, currentTokenId)));
     } else {
-      await db
-        .delete(refreshTokens)
-        .where(eq(refreshTokens.userId, userId));
+      await db.delete(refreshTokens).where(eq(refreshTokens.userId, userId));
     }
 
     logger.info('All other sessions revoked', { userId });
@@ -334,9 +321,10 @@ class UserSettingsService {
 
     const totalQuestionsAnswered = Number(stats[0]?.totalQuestionsAnswered) || 0;
     const correctAnswers = stats[0]?.correctAnswers || 0;
-    const overallAccuracy = totalQuestionsAnswered > 0
-      ? Math.round((correctAnswers / totalQuestionsAnswered) * 100 * 100) / 100
-      : 0;
+    const overallAccuracy =
+      totalQuestionsAnswered > 0
+        ? Math.round((correctAnswers / totalQuestionsAnswered) * 100 * 100) / 100
+        : 0;
 
     logger.info('Data export generated', { userId });
 
@@ -407,9 +395,7 @@ class UserSettingsService {
       .where(eq(users.id, userId));
 
     // Revoke all refresh tokens
-    await db
-      .delete(refreshTokens)
-      .where(eq(refreshTokens.userId, userId));
+    await db.delete(refreshTokens).where(eq(refreshTokens.userId, userId));
 
     // Clear caches
     try {

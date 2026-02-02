@@ -2,20 +2,11 @@
  * Authentication routes
  * Defines all auth-related API endpoints
  */
+import { registerSchema, loginSchema, refreshTokenSchema, logoutSchema } from '@project-z/shared';
 import { Router } from 'express';
+
 import { authController } from '../controllers';
-import { 
-  authenticate, 
-  validate, 
-  authRateLimiter,
-  loginRateLimiter,
-} from '../middleware';
-import { 
-  registerSchema, 
-  loginSchema, 
-  refreshTokenSchema,
-  logoutSchema,
-} from '@project-z/shared';
+import { authenticate, validate, authRateLimiter, loginRateLimiter } from '../middleware';
 
 const router = Router();
 
@@ -57,12 +48,7 @@ const router = Router();
  *       429:
  *         description: Too many requests
  */
-router.post(
-  '/register',
-  authRateLimiter,
-  validate(registerSchema),
-  authController.register
-);
+router.post('/register', validate(registerSchema), authController.register);
 
 /**
  * @swagger
@@ -97,12 +83,7 @@ router.post(
  *       429:
  *         description: Too many login attempts
  */
-router.post(
-  '/login',
-  loginRateLimiter,
-  validate(loginSchema),
-  authController.login
-);
+router.post('/login', validate(loginSchema), authController.login);
 
 /**
  * @swagger
@@ -129,12 +110,7 @@ router.post(
  *       401:
  *         description: Invalid or expired refresh token
  */
-router.post(
-  '/refresh',
-  authRateLimiter,
-  validate(refreshTokenSchema),
-  authController.refresh
-);
+router.post('/refresh', validate(refreshTokenSchema), authController.refresh);
 
 /**
  * @swagger
@@ -159,11 +135,7 @@ router.post(
  *       200:
  *         description: Logout successful
  */
-router.post(
-  '/logout',
-  validate(logoutSchema),
-  authController.logout
-);
+router.post('/logout', validate(logoutSchema), authController.logout);
 
 /**
  * @swagger
@@ -181,11 +153,7 @@ router.post(
  *       401:
  *         description: Not authenticated
  */
-router.post(
-  '/logout-all',
-  authenticate,
-  authController.logoutAll
-);
+router.post('/logout-all', authenticate, authController.logoutAll);
 
 /**
  * @swagger
@@ -203,10 +171,6 @@ router.post(
  *       401:
  *         description: Not authenticated
  */
-router.get(
-  '/me',
-  authenticate,
-  authController.getProfile
-);
+router.get('/me', authenticate, authController.getProfile);
 
 export const authRoutes = router;

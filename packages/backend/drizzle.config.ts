@@ -8,6 +8,7 @@ export default {
   out: './drizzle',
   driver: 'pg',
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL || 'postgresql://theogengineer@localhost:5432/pdf_quiz_gen',
+    connectionString:
+      process.env.DATABASE_URL || 'postgresql://theogengineer@localhost:5432/pdf_quiz_gen',
   },
 } satisfies Config;

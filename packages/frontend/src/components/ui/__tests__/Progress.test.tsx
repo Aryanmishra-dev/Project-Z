@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+
 import { Progress } from '../Progress';
 
 describe('Progress', () => {
@@ -32,8 +33,8 @@ describe('Progress', () => {
   });
 
   it('applies variant styles', () => {
-    const { rerender, container } = render(<Progress value={50} variant="primary" />);
-    expect(container.querySelector('[class*="bg-primary"]')).toBeInTheDocument();
+    const { rerender, container } = render(<Progress value={50} variant="default" />);
+    expect(container.querySelector('[class*="bg-primary-600"]')).toBeInTheDocument();
 
     rerender(<Progress value={50} variant="success" />);
     expect(container.querySelector('[class*="bg-success"]')).toBeInTheDocument();
@@ -55,7 +56,7 @@ describe('Progress', () => {
 
   it('accepts custom className', () => {
     render(<Progress value={50} className="custom-progress" />);
-    expect(screen.getByRole('progressbar').parentElement).toHaveClass('custom-progress');
+    expect(screen.getByRole('progressbar')).toHaveClass('custom-progress');
   });
 
   it('shows both label and value', () => {

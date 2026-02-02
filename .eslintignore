@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+venv
+__pycache__
+
+# Build outputs
+dist
+build
+.next
+out
+
+# Test outputs
+coverage
+.nyc_output
+playwright-report
+test-results
+
+# E2E tests (handled by playwright config)
+e2e/**/*
+
+# K6 load test files (use K6-specific linting)
+scripts/load-test/**/*.js
+
+# Config files
+*.config.js
+*.config.ts
+vitest.setup.ts
+commitlint.config.js
+ecosystem.config.js
+drizzle.config.ts
+playwright.config.ts
+
+# Uploads and generated files
+uploads
+packages/backend/uploads
+
+# Python virtual environment
+**/site-packages/**
+
+# Scripts that have their own linting
+scripts/**/*.js

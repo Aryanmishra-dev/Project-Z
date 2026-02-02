@@ -3,6 +3,7 @@
  * Implements secure password hashing according to OWASP guidelines
  */
 import argon2, { type Options } from 'argon2';
+
 import { logger } from './logger';
 
 /**
@@ -14,9 +15,9 @@ import { logger } from './logger';
 const ARGON2_CONFIG = {
   type: argon2.argon2id,
   memoryCost: 65536, // 64 MB
-  timeCost: 3,       // 3 iterations
-  parallelism: 4,    // 4 parallel threads
-  hashLength: 32,    // 32 bytes output
+  timeCost: 3, // 3 iterations
+  parallelism: 4, // 4 parallel threads
+  hashLength: 32, // 32 bytes output
 } as const;
 
 /**
@@ -31,8 +32,8 @@ export async function hashPassword(password: string): Promise<string> {
     logger.debug('Password hashed successfully');
     return hash;
   } catch (error) {
-    logger.error('Password hashing failed', { 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    logger.error('Password hashing failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     throw new Error('Failed to hash password');
   }
@@ -50,8 +51,8 @@ export async function verifyPassword(hash: string, password: string): Promise<bo
     logger.debug('Password verification completed', { isValid });
     return isValid;
   } catch (error) {
-    logger.error('Password verification failed', { 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    logger.error('Password verification failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     return false;
   }
@@ -67,7 +68,7 @@ export async function needsRehash(hash: string): Promise<boolean> {
     return argon2.needsRehash(hash, ARGON2_CONFIG);
   } catch (error) {
     logger.warn('Rehash check failed, assuming rehash needed', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     return true;
   }
@@ -113,7 +114,9 @@ export function validatePasswordStrength(password: string): {
   }
 
   if (PASSWORD_RULES.requireSpecial) {
-    const specialRegex = new RegExp(`[${PASSWORD_RULES.specialChars.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}]`);
+    const specialRegex = new RegExp(
+      `[${PASSWORD_RULES.specialChars.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}]`
+    );
     if (!specialRegex.test(password)) {
       errors.push('Password must contain at least one special character');
     }

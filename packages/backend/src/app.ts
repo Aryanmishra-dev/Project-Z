@@ -2,20 +2,18 @@
  * Express application setup
  * Configures middleware, routes, and error handling
  */
-import express, { Express } from 'express';
 import http from 'http';
-import helmet from 'helmet';
+
 import cors from 'cors';
+import express, { Express } from 'express';
+import helmet from 'helmet';
+
+import { errorHandler, notFoundHandler, requestIdMiddleware } from './middleware';
+import { closeQueues } from './queues';
 import { apiRoutes } from './routes';
-import { 
-  errorHandler, 
-  notFoundHandler,
-  requestIdMiddleware,
-} from './middleware';
 import { logger } from './utils/logger';
 // import { swaggerSetup } from './swagger'; // TODO: Install swagger-jsdoc and swagger-ui-express
 import { initializeWebSocket, closeWebSocket } from './websocket';
-import { closeQueues } from './queues';
 import { closeWorker } from './workers';
 
 /**
@@ -26,14 +24,37 @@ export function createApp(): Express {
 
   // Security middleware
   app.use(helmet());
-  
-  // CORS configuration
-  app.use(cors({
-    origin: process.env.CORS_ORIGIN?.split(',') || 'http://localhost:5173',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
-  }));
+
+  // CORS configuration - allow both common frontend ports
+  const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:3000',
+  ];
+
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+
+        if (Array.isArray(allowedOrigins)) {
+          if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        } else if (origin === allowedOrigins) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
+    })
+  );
 
   // Body parsing
   app.use(express.json({ limit: '10mb' }));
@@ -45,7 +66,7 @@ export function createApp(): Express {
   // Request logging
   app.use((req, res, next) => {
     const start = Date.now();
-    
+
     res.on('finish', () => {
       const duration = Date.now() - start;
       logger.info('Request completed', {
@@ -55,7 +76,7 @@ export function createApp(): Express {
         duration: `${duration}ms`,
       });
     });
-    
+
     next();
   });
 
@@ -80,10 +101,10 @@ export function createApp(): Express {
 export function createServer(): http.Server {
   const app = createApp();
   const server = http.createServer(app);
-  
+
   // Initialize Socket.IO
   initializeWebSocket(server);
-  
+
   return server;
 }
 
@@ -112,16 +133,16 @@ export async function startServer(): Promise<http.Server> {
  */
 export async function shutdownServer(server: http.Server): Promise<void> {
   logger.info('Shutting down server...');
-  
+
   // Close WebSocket connections
   await closeWebSocket();
-  
+
   // Close queue connections
   await closeQueues();
-  
+
   // Close worker
   await closeWorker();
-  
+
   // Close HTTP server
   return new Promise((resolve, reject) => {
     server.close((err) => {

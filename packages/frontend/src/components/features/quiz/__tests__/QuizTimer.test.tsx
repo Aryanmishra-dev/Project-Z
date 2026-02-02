@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { QuizTimer } from '../QuizTimer';
 
 describe('QuizTimer', () => {
@@ -13,103 +13,80 @@ describe('QuizTimer', () => {
   });
 
   it('renders initial time correctly', () => {
-    render(<QuizTimer initialTime={300} onTimeUp={vi.fn()} />);
+    render(<QuizTimer seconds={300} onTick={vi.fn()} />);
     expect(screen.getByText('05:00')).toBeInTheDocument();
   });
 
-  it('counts down every second', () => {
-    render(<QuizTimer initialTime={300} onTimeUp={vi.fn()} />);
-
-    expect(screen.getByText('05:00')).toBeInTheDocument();
+  it('calls onTick every second', () => {
+    const onTick = vi.fn();
+    render(<QuizTimer seconds={300} onTick={onTick} />);
 
     act(() => {
       vi.advanceTimersByTime(1000);
     });
 
-    expect(screen.getByText('04:59')).toBeInTheDocument();
+    expect(onTick).toHaveBeenCalledTimes(1);
 
     act(() => {
       vi.advanceTimersByTime(5000);
     });
 
-    expect(screen.getByText('04:54')).toBeInTheDocument();
+    expect(onTick).toHaveBeenCalledTimes(6);
   });
 
-  it('calls onTimeUp when time reaches zero', () => {
-    const onTimeUp = vi.fn();
-    render(<QuizTimer initialTime={3} onTimeUp={onTimeUp} />);
+  it('stops ticking when paused', () => {
+    const onTick = vi.fn();
+    render(<QuizTimer seconds={300} onTick={onTick} isPaused={true} />);
 
     act(() => {
-      vi.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(5000);
     });
 
-    expect(onTimeUp).toHaveBeenCalledTimes(1);
+    expect(onTick).not.toHaveBeenCalled();
   });
 
-  it('stops at zero', () => {
-    const onTimeUp = vi.fn();
-    render(<QuizTimer initialTime={2} onTimeUp={onTimeUp} />);
+  it('stops ticking when time reaches zero', () => {
+    const onTick = vi.fn();
+    render(<QuizTimer seconds={0} onTick={onTick} />);
 
     act(() => {
-      vi.advanceTimersByTime(5000); // Advance past zero
+      vi.advanceTimersByTime(1000);
     });
 
-    expect(screen.getByText('00:00')).toBeInTheDocument();
-    expect(onTimeUp).toHaveBeenCalledTimes(1);
+    expect(onTick).not.toHaveBeenCalled();
   });
 
   it('shows warning state when time is low', () => {
-    render(<QuizTimer initialTime={60} onTimeUp={vi.fn()} />);
+    render(<QuizTimer seconds={50} onTick={vi.fn()} warningThreshold={60} />);
 
     // Should show warning styling (typically red/orange)
-    const timer = screen.getByText('01:00').closest('div');
-    expect(timer).toHaveClass(/warning|error|text-red|text-warning/);
+    const timer = screen.getByRole('timer');
+    expect(timer).toHaveClass(/warning|text-warning/);
   });
 
   it('shows critical state when time is very low', () => {
-    render(<QuizTimer initialTime={30} onTimeUp={vi.fn()} />);
+    render(<QuizTimer seconds={10} onTick={vi.fn()} />);
 
-    const timer = screen.getByText('00:30').closest('div');
+    const timer = screen.getByRole('timer');
     // Should have urgent styling
-    expect(timer).toBeDefined();
+    expect(timer).toHaveClass(/error|text-error/);
   });
 
   it('formats time with leading zeros', () => {
-    render(<QuizTimer initialTime={65} onTimeUp={vi.fn()} />);
+    render(<QuizTimer seconds={65} onTick={vi.fn()} />);
     expect(screen.getByText('01:05')).toBeInTheDocument();
   });
 
   it('handles hours correctly for long quizzes', () => {
-    render(<QuizTimer initialTime={3665} onTimeUp={vi.fn()} />);
-    // Should display 1:01:05 or 61:05
-    expect(screen.getByText(/61:05|1:01:05/)).toBeInTheDocument();
-  });
-
-  it('is paused when isPaused is true', () => {
-    render(<QuizTimer initialTime={300} onTimeUp={vi.fn()} isPaused={true} />);
-
-    expect(screen.getByText('05:00')).toBeInTheDocument();
-
-    act(() => {
-      vi.advanceTimersByTime(5000);
-    });
-
-    // Time should not have changed
-    expect(screen.getByText('05:00')).toBeInTheDocument();
+    render(<QuizTimer seconds={3665} onTick={vi.fn()} />);
+    expect(screen.getByText(/61:05|0?1:01:05/)).toBeInTheDocument();
   });
 
   it('has accessible time display', () => {
-    render(<QuizTimer initialTime={300} onTimeUp={vi.fn()} />);
+    render(<QuizTimer seconds={300} onTick={vi.fn()} />);
 
-    // Should have aria-live or similar for screen readers
-    const timer = screen.getByText('05:00');
+    const timer = screen.getByRole('timer');
     expect(timer).toHaveAttribute('aria-live', 'polite');
-  });
-
-  it('shows clock icon', () => {
-    render(<QuizTimer initialTime={300} onTimeUp={vi.fn()} />);
-
-    // Should have a clock icon
-    expect(screen.getByTestId('clock-icon') || screen.getByRole('img', { hidden: true })).toBeDefined();
+    expect(timer).toHaveAttribute('aria-label', expect.stringContaining('05:00'));
   });
 });

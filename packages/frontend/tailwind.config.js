@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -111,20 +108,20 @@ export default {
           '70%': { transform: 'scale(0.9)' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
-        'shake': {
+        shake: {
           '0%, 100%': { transform: 'translateX(0)' },
           '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
           '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
         },
-        'spin': {
+        spin: {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
-        'pulse': {
+        pulse: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.5' },
         },
-        'shimmer': {
+        shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
         },
@@ -132,7 +129,7 @@ export default {
           '0%': { transform: 'translateY(-100vh) rotate(0deg)', opacity: '1' },
           '100%': { transform: 'translateY(100vh) rotate(720deg)', opacity: '0' },
         },
-        'celebrate': {
+        celebrate: {
           '0%': { transform: 'scale(1)' },
           '50%': { transform: 'scale(1.1)' },
           '100%': { transform: 'scale(1)' },
@@ -142,15 +139,15 @@ export default {
           '70%': { boxShadow: '0 0 0 10px rgba(99, 102, 241, 0)' },
           '100%': { boxShadow: '0 0 0 0 rgba(99, 102, 241, 0)' },
         },
-        'ripple': {
+        ripple: {
           '0%': { transform: 'scale(0)', opacity: '0.5' },
           '100%': { transform: 'scale(4)', opacity: '0' },
         },
-        'float': {
+        float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-5px)' },
         },
-        'glow': {
+        glow: {
           '0%, 100%': { boxShadow: '0 0 3px rgba(99, 102, 241, 0.3)' },
           '50%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.6)' },
         },
@@ -167,18 +164,18 @@ export default {
         'scale-in': 'scale-in 0.2s ease-out',
         'scale-out': 'scale-out 0.2s ease-out',
         'bounce-in': 'bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-        'shake': 'shake 0.5s ease-in-out',
-        'spin': 'spin 1s linear infinite',
-        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'shimmer': 'shimmer 2s linear infinite',
+        shake: 'shake 0.5s ease-in-out',
+        spin: 'spin 1s linear infinite',
+        pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        shimmer: 'shimmer 2s linear infinite',
         'confetti-fall': 'confetti-fall 3s linear forwards',
-        'celebrate': 'celebrate 0.5s ease-in-out',
+        celebrate: 'celebrate 0.5s ease-in-out',
         'progress-pulse': 'progress-pulse 2s infinite',
-        'ripple': 'ripple 0.6s linear',
-        'float': 'float 3s ease-in-out infinite',
-        'glow': 'glow 2s ease-in-out infinite',
+        ripple: 'ripple 0.6s linear',
+        float: 'float 3s ease-in-out infinite',
+        glow: 'glow 2s ease-in-out infinite',
       },
     },
   },
   plugins: [],
-}
+};

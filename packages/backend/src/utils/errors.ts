@@ -98,7 +98,13 @@ export class RateLimitError extends AppError {
   public readonly retryAfter: number;
 
   constructor(retryAfter: number) {
-    super(`Too many requests, retry after ${retryAfter} seconds`, 429, 'RATE_LIMIT_EXCEEDED', true, { retryAfter });
+    super(
+      `Too many requests, retry after ${retryAfter} seconds`,
+      429,
+      'RATE_LIMIT_EXCEEDED',
+      true,
+      { retryAfter }
+    );
     this.retryAfter = retryAfter;
     Object.setPrototypeOf(this, RateLimitError.prototype);
   }

@@ -1,33 +1,39 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff, Mail, Lock, User, Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, Check, X } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui';
-import { useAuthStore } from '@/stores/authStore';
-import { getErrorMessage } from '@/lib/api';
-import { ROUTES } from '@/utils/constants';
-import { cn } from '@/utils/cn';
+import { z } from 'zod';
 
-const registerSchema = z.object({
-  fullName: z
-    .string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(100, 'Name must not exceed 100 characters'),
-  email: z.string().email('Invalid email format'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one digit')
-    .regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/, 'Password must contain at least one special character'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-});
+import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui';
+import { getErrorMessage } from '@/lib/api';
+import { useAuthStore } from '@/stores/authStore';
+import { cn } from '@/utils/cn';
+import { ROUTES } from '@/utils/constants';
+
+const registerSchema = z
+  .object({
+    fullName: z
+      .string()
+      .min(2, 'Name must be at least 2 characters')
+      .max(100, 'Name must not exceed 100 characters'),
+    email: z.string().email('Invalid email format'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one digit')
+      .regex(
+        /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/,
+        'Password must contain at least one special character'
+      ),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -91,12 +97,9 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         <CardDescription>Get started with QuizGenius</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           {error && (
-            <div
-              className="rounded-md bg-error-50 p-3 text-sm text-error-700"
-              role="alert"
-            >
+            <div className="rounded-md bg-error-50 p-3 text-sm text-error-700" role="alert">
               {error}
             </div>
           )}
@@ -177,7 +180,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            
+
             {/* Password requirements */}
             {password && (
               <div className="mt-2 space-y-1">
@@ -191,11 +194,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                         isValid ? 'text-success-600' : 'text-gray-500'
                       )}
                     >
-                      {isValid ? (
-                        <Check className="h-3 w-3" />
-                      ) : (
-                        <X className="h-3 w-3" />
-                      )}
+                      {isValid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
                       {req.label}
                     </div>
                   );
@@ -243,10 +242,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           <p className="text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link
-              to={ROUTES.LOGIN}
-              className="font-medium text-primary-600 hover:text-primary-700"
-            >
+            <Link to={ROUTES.LOGIN} className="font-medium text-primary-600 hover:text-primary-700">
               Sign in
             </Link>
           </p>

@@ -65,11 +65,5 @@ export {
 export { Confetti, ConfettiStreamers, ConfettiFireworks } from './Confetti';
 export type { ConfettiProps } from './Confetti';
 
-export {
-  PageTransition,
-  StaggeredList,
-  AnimateOnScroll,
-  Collapse,
-} from './PageTransition';
+export { PageTransition, StaggeredList, AnimateOnScroll, Collapse } from './PageTransition';
 export type { PageTransitionProps, TransitionType } from './PageTransition';
-

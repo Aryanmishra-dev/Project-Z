@@ -2,8 +2,12 @@
  * PDF Routes
  * Handles PDF upload, listing, viewing, and deletion
  */
+import fs from 'fs';
+import path from 'path';
+
 import { Router } from 'express';
 import { z } from 'zod';
+
 import {
   authenticate,
   validate,
@@ -13,14 +17,12 @@ import {
   asyncHandler,
   sanitizeFilename,
 } from '../middleware';
+import { AuthenticatedRequest } from '../middleware/auth';
+import { addPdfProcessingJob, getJobStatus, cancelJob } from '../queues';
 import { pdfService } from '../services/pdf.service';
 import { questionsService } from '../services/questions.service';
-import { addPdfProcessingJob, getJobStatus, cancelJob } from '../queues';
-import { AuthenticatedRequest } from '../middleware/auth';
-import { logger } from '../utils/logger';
 import { NotFoundError, ValidationError } from '../utils/errors';
-import path from 'path';
-import fs from 'fs';
+import { logger } from '../utils/logger';
 
 const router = Router();
 
@@ -191,7 +193,9 @@ router.get(
   validate(listPdfsQuerySchema, 'query'),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const userId = req.user!.sub;
-    const { status, limit, offset, page, sortBy, sortOrder } = req.query as z.infer<typeof listPdfsQuerySchema>;
+    const { status, limit, offset, page, sortBy, sortOrder } = req.query as z.infer<
+      typeof listPdfsQuerySchema
+    >;
 
     // Calculate offset from page if provided
     const calculatedOffset = page ? (page - 1) * limit : offset;

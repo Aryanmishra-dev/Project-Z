@@ -1,11 +1,7 @@
-import { api } from '@/lib/api';
-import type {
-  AuthResponse,
-  LoginCredentials,
-  RegisterData,
-  User
-} from '@/types';
 import { settingsService } from './settings.service';
+
+import { api } from '@/lib/api';
+import type { AuthResponse, LoginCredentials, RegisterData, User } from '@/types';
 
 // Backend response structure (tokens are nested)
 interface BackendAuthResponse {
@@ -63,7 +59,7 @@ export const authService = {
   async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     const response = await api.post<{
       success: boolean;
-      data: { tokens: { accessToken: string; refreshToken: string; expiresIn: number } }
+      data: { tokens: { accessToken: string; refreshToken: string; expiresIn: number } };
     }>('/api/v1/auth/refresh', { refreshToken });
     const { tokens } = response.data.data;
     return {
@@ -76,9 +72,7 @@ export const authService = {
    * Get the current user's profile
    */
   async getProfile(): Promise<User> {
-    const response = await api.get<{ success: boolean; data: { user: User } }>(
-      '/api/v1/auth/me'
-    );
+    const response = await api.get<{ success: boolean; data: { user: User } }>('/api/v1/auth/me');
     return response.data.data.user;
   },
 

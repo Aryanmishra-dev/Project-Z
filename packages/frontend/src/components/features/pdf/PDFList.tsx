@@ -1,11 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { FileText, AlertCircle } from 'lucide-react';
+
 import { PDFCard } from './PDFCard';
-import { Spinner, Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
+
+import {
+  Spinner,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui';
 import { pdfService } from '@/services/pdf.service';
 import { usePDFStore } from '@/stores/pdfStore';
-import { DEFAULT_PAGE_SIZE } from '@/utils/constants';
 import type { PDFStatus } from '@/types';
+import { DEFAULT_PAGE_SIZE } from '@/utils/constants';
 
 interface PDFListProps {
   onUploadClick?: () => void;
@@ -76,7 +86,10 @@ export function PDFList({ onUploadClick }: PDFListProps) {
           <Select
             value={`${filters.sortBy}-${filters.sortOrder}`}
             onValueChange={(value) => {
-              const [sortBy, sortOrder] = value.split('-') as [typeof filters.sortBy, typeof filters.sortOrder];
+              const [sortBy, sortOrder] = value.split('-') as [
+                typeof filters.sortBy,
+                typeof filters.sortOrder,
+              ];
               setFilters({ sortBy, sortOrder });
             }}
           >

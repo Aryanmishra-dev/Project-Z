@@ -3,6 +3,7 @@
  * Uses ioredis for robust connection handling
  */
 import Redis from 'ioredis';
+
 import { logger } from '../utils/logger';
 
 /**
@@ -32,7 +33,7 @@ const redisConfig = {
 function getRedisUrl(): string {
   const url = process.env.REDIS_URL;
   if (url) return url;
-  
+
   const { host, port, password, db } = redisConfig;
   if (password) {
     return `redis://:${password}@${host}:${port}/${db}`;
@@ -78,13 +79,13 @@ redis.on('reconnecting', () => {
 export const REDIS_KEYS = {
   /** Refresh token storage: refresh_token:{user_id}:{jti} */
   REFRESH_TOKEN: 'refresh_token',
-  
+
   /** Session data: session:{user_id}:{device_id} */
   SESSION: 'session',
-  
+
   /** Rate limiting: rate_limit:{endpoint}:{ip} */
   RATE_LIMIT: 'rate_limit',
-  
+
   /** User sessions list: user_sessions:{user_id} */
   USER_SESSIONS: 'user_sessions',
 } as const;
@@ -111,7 +112,7 @@ export async function checkRedisConnection(): Promise<boolean> {
     return pong === 'PONG';
   } catch (error) {
     logger.error('Redis connection failed', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     return false;
   }
@@ -153,7 +154,7 @@ export async function storeSession(
 ): Promise<void> {
   const key = buildRedisKey(REDIS_KEYS.SESSION, userId, deviceId);
   await redis.setex(key, ttlSeconds, JSON.stringify(data));
-  
+
   // Track session in user's session list
   const userSessionsKey = buildRedisKey(REDIS_KEYS.USER_SESSIONS, userId);
   await redis.sadd(userSessionsKey, deviceId);
@@ -166,10 +167,7 @@ export async function storeSession(
  * @param deviceId Device identifier
  * @returns Session data or null if not found
  */
-export async function getSession(
-  userId: string,
-  deviceId: string
-): Promise<SessionData | null> {
+export async function getSession(userId: string, deviceId: string): Promise<SessionData | null> {
   const key = buildRedisKey(REDIS_KEYS.SESSION, userId, deviceId);
   const data = await redis.get(key);
   return data ? JSON.parse(data) : null;
@@ -183,7 +181,7 @@ export async function getSession(
 export async function deleteSession(userId: string, deviceId: string): Promise<void> {
   const key = buildRedisKey(REDIS_KEYS.SESSION, userId, deviceId);
   await redis.del(key);
-  
+
   // Remove from user's session list
   const userSessionsKey = buildRedisKey(REDIS_KEYS.USER_SESSIONS, userId);
   await redis.srem(userSessionsKey, deviceId);
@@ -196,7 +194,7 @@ export async function deleteSession(userId: string, deviceId: string): Promise<v
 export async function deleteAllUserSessions(userId: string): Promise<void> {
   const userSessionsKey = buildRedisKey(REDIS_KEYS.USER_SESSIONS, userId);
   const deviceIds = await redis.smembers(userSessionsKey);
-  
+
   // Delete all session keys
   const pipeline = redis.pipeline();
   for (const deviceId of deviceIds) {

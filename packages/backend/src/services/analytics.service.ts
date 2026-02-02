@@ -2,9 +2,9 @@
  * Analytics Service
  * Aggregated statistics and metrics with Redis caching
  */
-import { redis } from '../config/redis';
 import { pdfService } from './pdf.service';
 import { quizSessionsService } from './quiz-sessions.service';
+import { redis } from '../config/redis';
 import { logger } from '../utils/logger';
 
 /**
@@ -90,9 +90,11 @@ class AnalyticsService {
         averageScore: Math.round(quizStats.averageScore * 100) / 100,
         totalQuestionsAnswered: quizStats.totalQuestionsAnswered,
         correctAnswers: quizStats.correctAnswers,
-        accuracy: quizStats.totalQuestionsAnswered > 0
-          ? Math.round((quizStats.correctAnswers / quizStats.totalQuestionsAnswered) * 10000) / 100
-          : 0,
+        accuracy:
+          quizStats.totalQuestionsAnswered > 0
+            ? Math.round((quizStats.correctAnswers / quizStats.totalQuestionsAnswered) * 10000) /
+              100
+            : 0,
       },
       recentActivity: {
         quizzesThisWeek: 0, // Would need additional query
@@ -172,12 +174,12 @@ class AnalyticsService {
       const nlpUrl = process.env.NLP_SERVICE_URL || 'http://localhost:8000';
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
-      
+
       const response = await fetch(`${nlpUrl}/health`, {
         signal: controller.signal,
       });
       clearTimeout(timeout);
-      
+
       results.nlpService = response.ok;
     } catch {
       results.nlpService = false;

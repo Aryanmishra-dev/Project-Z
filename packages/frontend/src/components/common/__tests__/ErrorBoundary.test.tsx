@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+
 import { ErrorBoundary } from '../ErrorBoundary';
 
 // Component that throws an error
@@ -58,7 +59,7 @@ describe('ErrorBoundary', () => {
     );
 
     expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
-    
+
     const retryButton = screen.getByRole('button', { name: /try again/i });
     expect(retryButton).toBeInTheDocument();
   });

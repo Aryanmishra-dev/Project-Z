@@ -2,28 +2,32 @@
  * PDF Routes Integration Tests
  * Tests PDF upload, listing, and management endpoints
  */
-import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest';
-import request from 'supertest';
-import { createApp } from '../../src/app';
-import { Express } from 'express';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+
+import { Express } from 'express';
+import request from 'supertest';
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest';
+
+import { createApp } from '../../src/app';
 
 // Mock dependencies
 vi.mock('../../src/db', () => ({
   db: {
     insert: vi.fn().mockReturnValue({
       values: vi.fn().mockReturnValue({
-        returning: vi.fn().mockResolvedValue([{
-          id: 'test-pdf-id',
-          userId: 'test-user-id',
-          filename: 'test.pdf',
-          filePath: '/uploads/test.pdf',
-          fileSizeBytes: 1024,
-          status: 'pending',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }]),
+        returning: vi.fn().mockResolvedValue([
+          {
+            id: 'test-pdf-id',
+            userId: 'test-user-id',
+            filename: 'test.pdf',
+            filePath: '/uploads/test.pdf',
+            fileSizeBytes: 1024,
+            status: 'pending',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ]),
       }),
     }),
     select: vi.fn().mockReturnValue({
@@ -87,7 +91,7 @@ vi.mock('../../src/middleware/auth', async () => {
 
 describe('PDF Routes', () => {
   let app: Express;
-  
+
   beforeAll(() => {
     app = createApp();
   });

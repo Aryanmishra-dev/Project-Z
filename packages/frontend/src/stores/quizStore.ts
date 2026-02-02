@@ -1,8 +1,6 @@
 import { create } from 'zustand';
-import type { 
-  QuizSessionWithDetails, 
-  Question
-} from '@/types';
+
+import type { QuizSessionWithDetails, Question } from '@/types';
 
 interface QuizState {
   currentSession: QuizSessionWithDetails | null;
@@ -87,16 +85,14 @@ export const useQuizStore = create<QuizStore>((set, get) => ({
     }
   },
 
-  setTimeRemaining: (seconds) =>
-    set({ timeRemaining: seconds }),
+  setTimeRemaining: (seconds) => set({ timeRemaining: seconds }),
 
   decrementTime: () =>
     set((state) => ({
       timeRemaining: state.timeRemaining !== null ? Math.max(0, state.timeRemaining - 1) : null,
     })),
 
-  setSubmitting: (isSubmitting) =>
-    set({ isSubmitting }),
+  setSubmitting: (isSubmitting) => set({ isSubmitting }),
 
   clearQuiz: () => set(initialState),
 }));

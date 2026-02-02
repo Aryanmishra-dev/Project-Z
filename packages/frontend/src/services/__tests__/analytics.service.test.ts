@@ -25,142 +25,190 @@ describe('Analytics Service', () => {
     vi.resetAllMocks();
   });
 
+  describe('getDashboard', () => {
+    it('should fetch dashboard data successfully', async () => {
+      const mockDashboard = {
+        pdfs: { total: 10, completed: 8, pending: 1, failed: 1, totalQuestions: 100 },
+        quizzes: {
+          total: 50,
+          completed: 45,
+          averageScore: 75,
+          totalQuestionsAnswered: 500,
+          correctAnswers: 375,
+          accuracy: 75,
+        },
+        recentActivity: {
+          lastQuizDate: '2024-01-05',
+          lastUploadDate: '2024-01-04',
+          quizzesThisWeek: 5,
+        },
+      };
+
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: { success: true, data: mockDashboard },
+      });
+
+      const { analyticsService } = await import('../analytics.service');
+      const result = await analyticsService.getDashboard();
+
+      expect(api.get).toHaveBeenCalledWith('/api/v1/analytics/dashboard', {
+        params: { refresh: false },
+      });
+      expect(result.pdfs.total).toBe(10);
+      expect(result.quizzes.averageScore).toBe(75);
+    });
+  });
+
   describe('getTrends', () => {
     it('should fetch trends data successfully', async () => {
       const mockTrends = {
-        overall: {
-          currentScore: 85,
-          previousScore: 75,
-          percentageChange: 13.33,
-          trend: 'up',
-          dataPoints: [
-            { date: '2024-01-01', score: 70, quizCount: 3 },
-            { date: '2024-01-02', score: 80, quizCount: 2 },
-          ],
-        },
+        dailyScores: [
+          { date: '2024-01-01', avgScore: 70, quizzes: 3, totalQuestions: 30, correctAnswers: 21 },
+          { date: '2024-01-02', avgScore: 80, quizzes: 2, totalQuestions: 20, correctAnswers: 16 },
+        ],
         byDifficulty: {
-          easy: { averageScore: 90, trend: 'stable', totalQuestions: 50 },
-          medium: { averageScore: 75, trend: 'up', totalQuestions: 40 },
-          hard: { averageScore: 60, trend: 'down', totalQuestions: 20 },
+          easy: { avgScore: 90, totalQuestions: 50, correctAnswers: 45, quizzes: 10 },
+          medium: { avgScore: 75, totalQuestions: 40, correctAnswers: 30, quizzes: 8 },
+          hard: { avgScore: 60, totalQuestions: 20, correctAnswers: 12, quizzes: 4 },
         },
-        period: '30d',
+        overallTrend: 'improving',
+        improvementRate: 5.2,
       };
 
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockTrends });
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: { success: true, data: mockTrends },
+      });
 
       const { analyticsService } = await import('../analytics.service');
-      const result = await analyticsService.getTrends('30d');
+      const result = await analyticsService.getTrends();
 
-      expect(api.get).toHaveBeenCalledWith('/analytics/trends', { params: { period: '30d' } });
-      expect(result.overall.currentScore).toBe(85);
+      expect(api.get).toHaveBeenCalledWith('/api/v1/analytics/trends', {
+        params: { refresh: false },
+      });
+      expect(result.overallTrend).toBe('improving');
+      expect(result.byDifficulty.easy.avgScore).toBe(90);
     });
 
-    it('should handle different time periods', async () => {
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValue({ data: {} });
+    it('should pass refresh parameter', async () => {
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValue({
+        data: { success: true, data: {} },
+      });
 
       const { analyticsService } = await import('../analytics.service');
-      
-      await analyticsService.getTrends('7d');
-      expect(api.get).toHaveBeenCalledWith('/analytics/trends', { params: { period: '7d' } });
 
-      await analyticsService.getTrends('90d');
-      expect(api.get).toHaveBeenCalledWith('/analytics/trends', { params: { period: '90d' } });
+      await analyticsService.getTrends(true);
+      expect(api.get).toHaveBeenCalledWith('/api/v1/analytics/trends', {
+        params: { refresh: true },
+      });
     });
 
     it('should handle API errors', async () => {
       (api.get as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
 
       const { analyticsService } = await import('../analytics.service');
-      
-      await expect(analyticsService.getTrends('30d')).rejects.toThrow('Network error');
+
+      await expect(analyticsService.getTrends()).rejects.toThrow('Network error');
     });
   });
 
   describe('getWeakAreas', () => {
     it('should fetch weak areas successfully', async () => {
-      const mockWeakAreas = [
-        {
-          category: 'JavaScript',
-          topic: 'Closures',
-          errorRate: 0.45,
-          totalAttempts: 20,
-          lastAttempted: '2024-01-05',
-          suggestedResources: ['MDN Closures Guide'],
-        },
-        {
-          category: 'React',
-          topic: 'Hooks',
-          errorRate: 0.35,
-          totalAttempts: 15,
-          lastAttempted: '2024-01-04',
-          suggestedResources: ['React Docs'],
-        },
-      ];
+      const mockWeakAreas = {
+        weakQuestions: [
+          {
+            questionId: '1',
+            questionText: 'What is a closure?',
+            pdfFilename: 'javascript.pdf',
+            pdfId: 'pdf-1',
+            difficulty: 'hard',
+            attempts: 5,
+            correct: 1,
+            accuracy: 20,
+          },
+        ],
+        weakDifficulties: ['hard'],
+        recommendedPdfs: [
+          { pdfId: 'pdf-1', filename: 'javascript.pdf', weakQuestionCount: 3, avgAccuracy: 40 },
+        ],
+        totalWeakAreas: 5,
+      };
 
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockWeakAreas });
-
-      const { analyticsService } = await import('../analytics.service');
-      const result = await analyticsService.getWeakAreas();
-
-      expect(api.get).toHaveBeenCalledWith('/analytics/weak-areas');
-      expect(result).toHaveLength(2);
-      expect(result[0].category).toBe('JavaScript');
-    });
-
-    it('should return empty array for new users', async () => {
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: [] });
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: { success: true, data: mockWeakAreas },
+      });
 
       const { analyticsService } = await import('../analytics.service');
       const result = await analyticsService.getWeakAreas();
 
-      expect(result).toEqual([]);
+      expect(api.get).toHaveBeenCalledWith('/api/v1/analytics/weak-areas', {
+        params: { refresh: false },
+      });
+      expect(result.weakQuestions).toHaveLength(1);
+      expect(result.totalWeakAreas).toBe(5);
     });
 
-    it('should pass limit parameter', async () => {
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValue({ data: [] });
+    it('should return empty data for new users', async () => {
+      const emptyData = {
+        weakQuestions: [],
+        weakDifficulties: [],
+        recommendedPdfs: [],
+        totalWeakAreas: 0,
+      };
+
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: { success: true, data: emptyData },
+      });
 
       const { analyticsService } = await import('../analytics.service');
-      await analyticsService.getWeakAreas(5);
+      const result = await analyticsService.getWeakAreas();
 
-      expect(api.get).toHaveBeenCalledWith('/analytics/weak-areas', { params: { limit: 5 } });
+      expect(result.weakQuestions).toEqual([]);
+      expect(result.totalWeakAreas).toBe(0);
     });
   });
 
   describe('getPatterns', () => {
     it('should fetch learning patterns successfully', async () => {
       const mockPatterns = {
-        bestTimeOfDay: 'morning',
-        bestDayOfWeek: 'Saturday',
-        optimalQuizLength: 15,
-        averageTimePerQuestion: 45,
-        retentionRate: 78,
-        improvementRate: 5.2,
+        bestTimeOfDay: { hour: 10, avgScore: 85, quizCount: 15 },
+        optimalQuizLength: { questionCount: 15, avgScore: 80, quizCount: 10 },
+        retention: { pdfRetakeRate: 0.3, avgImprovementOnRetake: 12 },
+        avgTimePerQuestion: 45,
+        fastestCompletionTime: 120,
       };
 
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockPatterns });
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: { success: true, data: mockPatterns },
+      });
 
       const { analyticsService } = await import('../analytics.service');
       const result = await analyticsService.getPatterns();
 
-      expect(api.get).toHaveBeenCalledWith('/analytics/patterns');
-      expect(result.bestTimeOfDay).toBe('morning');
-      expect(result.optimalQuizLength).toBe(15);
+      expect(api.get).toHaveBeenCalledWith('/api/v1/analytics/patterns', {
+        params: { refresh: false },
+      });
+      expect(result.bestTimeOfDay?.hour).toBe(10);
+      expect(result.avgTimePerQuestion).toBe(45);
     });
 
     it('should handle null values for new users', async () => {
       const mockPatterns = {
         bestTimeOfDay: null,
         optimalQuizLength: null,
-        averageTimePerQuestion: null,
-        retentionRate: null,
+        retention: { pdfRetakeRate: 0, avgImprovementOnRetake: 0 },
+        avgTimePerQuestion: 0,
+        fastestCompletionTime: 0,
       };
 
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockPatterns });
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: { success: true, data: mockPatterns },
+      });
 
       const { analyticsService } = await import('../analytics.service');
       const result = await analyticsService.getPatterns();
 
       expect(result.bestTimeOfDay).toBeNull();
+      expect(result.optimalQuizLength).toBeNull();
     });
   });
 
@@ -169,167 +217,100 @@ describe('Analytics Service', () => {
       const mockStreaks = {
         currentStreak: 7,
         longestStreak: 14,
+        totalQuizzes: 50,
+        totalQuestionsAnswered: 500,
         lastActivityDate: '2024-01-05',
-        activityHistory: [
-          { date: '2024-01-05', quizCount: 3 },
-          { date: '2024-01-04', quizCount: 2 },
-          { date: '2024-01-03', quizCount: 1 },
-        ],
-        milestones: [
-          { days: 7, achieved: true, achievedDate: '2024-01-01' },
-          { days: 30, achieved: false, achievedDate: null },
-        ],
+        streakDates: ['2024-01-05', '2024-01-04', '2024-01-03'],
+        milestones: {
+          quizzes: { current: 50, next: 100, progress: 50 },
+          questions: { current: 500, next: 1000, progress: 50 },
+          streak: { current: 7, next: 14, progress: 50 },
+        },
       };
 
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockStreaks });
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: { success: true, data: mockStreaks },
+      });
 
       const { analyticsService } = await import('../analytics.service');
       const result = await analyticsService.getStreaks();
 
-      expect(api.get).toHaveBeenCalledWith('/analytics/streaks');
+      expect(api.get).toHaveBeenCalledWith('/api/v1/analytics/streaks', {
+        params: { refresh: false },
+      });
       expect(result.currentStreak).toBe(7);
-      expect(result.milestones).toHaveLength(2);
+      expect(result.milestones.quizzes.current).toBe(50);
     });
 
     it('should return zero streak for inactive users', async () => {
       const mockStreaks = {
         currentStreak: 0,
         longestStreak: 5,
-        lastActivityDate: '2024-01-01',
-        activityHistory: [],
-        milestones: [],
+        totalQuizzes: 10,
+        totalQuestionsAnswered: 100,
+        lastActivityDate: null,
+        streakDates: [],
+        milestones: {
+          quizzes: { current: 10, next: 25, progress: 40 },
+          questions: { current: 100, next: 250, progress: 40 },
+          streak: { current: 0, next: 7, progress: 0 },
+        },
       };
 
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockStreaks });
+      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        data: { success: true, data: mockStreaks },
+      });
 
       const { analyticsService } = await import('../analytics.service');
       const result = await analyticsService.getStreaks();
 
       expect(result.currentStreak).toBe(0);
+      expect(result.lastActivityDate).toBeNull();
     });
   });
 
-  describe('getOverview', () => {
-    it('should fetch overview statistics', async () => {
-      const mockOverview = {
-        totalQuizzes: 50,
-        totalQuestions: 500,
-        averageScore: 75.5,
-        totalTimeSpent: 36000, // 10 hours in seconds
-        bestScore: 100,
-        recentScores: [80, 75, 90, 85, 70],
-      };
-
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockOverview });
+  describe('invalidateCache', () => {
+    it('should call invalidate cache endpoint', async () => {
+      (api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { success: true } });
 
       const { analyticsService } = await import('../analytics.service');
-      const result = await analyticsService.getOverview();
+      await analyticsService.invalidateCache();
 
-      expect(api.get).toHaveBeenCalledWith('/analytics/overview');
-      expect(result.totalQuizzes).toBe(50);
-    });
-  });
-
-  describe('getDashboardData', () => {
-    it('should fetch all dashboard data in parallel', async () => {
-      const mockTrends = { overall: { currentScore: 85 }, byDifficulty: {}, period: '7d' };
-      const mockWeakAreas = [{ category: 'JS', topic: 'Closures', errorRate: 0.4 }];
-      const mockPatterns = { bestTimeOfDay: 'morning', optimalQuizLength: 15 };
-      const mockStreaks = { currentStreak: 5, longestStreak: 10 };
-
-      (api.get as ReturnType<typeof vi.fn>)
-        .mockResolvedValueOnce({ data: mockTrends })
-        .mockResolvedValueOnce({ data: mockWeakAreas })
-        .mockResolvedValueOnce({ data: mockPatterns })
-        .mockResolvedValueOnce({ data: mockStreaks });
-
-      const { analyticsService } = await import('../analytics.service');
-      const result = await analyticsService.getDashboardData();
-
-      expect(result.trends).toBeDefined();
-      expect(result.weakAreas).toBeDefined();
-      expect(result.patterns).toBeDefined();
-      expect(result.streaks).toBeDefined();
-    });
-
-    it('should handle partial failures gracefully', async () => {
-      (api.get as ReturnType<typeof vi.fn>)
-        .mockResolvedValueOnce({ data: { overall: { currentScore: 85 } } })
-        .mockRejectedValueOnce(new Error('Weak areas failed'))
-        .mockResolvedValueOnce({ data: { bestTimeOfDay: 'morning' } })
-        .mockResolvedValueOnce({ data: { currentStreak: 5 } });
-
-      const { analyticsService } = await import('../analytics.service');
-      
-      // Should handle partial failure
-      try {
-        await analyticsService.getDashboardData();
-      } catch (error) {
-        expect(error).toBeDefined();
-      }
+      expect(api.post).toHaveBeenCalledWith('/api/v1/analytics/invalidate-cache');
     });
   });
 });
 
-describe('Analytics Data Transformation', () => {
-  describe('formatTimeOfDay', () => {
-    it('should format time of day correctly', async () => {
-      const { formatTimeOfDay } = await import('../analytics.service');
-      
-      expect(formatTimeOfDay('morning')).toBe('Morning (6am-12pm)');
-      expect(formatTimeOfDay('afternoon')).toBe('Afternoon (12pm-6pm)');
-      expect(formatTimeOfDay('evening')).toBe('Evening (6pm-12am)');
-      expect(formatTimeOfDay('night')).toBe('Night (12am-6am)');
-    });
-  });
-
-  describe('calculateTrendDirection', () => {
-    it('should determine trend direction correctly', async () => {
-      const { calculateTrendDirection } = await import('../analytics.service');
-      
-      expect(calculateTrendDirection(10)).toBe('up');
-      expect(calculateTrendDirection(-10)).toBe('down');
-      expect(calculateTrendDirection(2)).toBe('stable');
-      expect(calculateTrendDirection(-2)).toBe('stable');
-    });
-  });
-
-  describe('formatDuration', () => {
-    it('should format duration in human-readable form', async () => {
-      const { formatDuration } = await import('../analytics.service');
-      
-      expect(formatDuration(3600)).toBe('1h 0m');
-      expect(formatDuration(5400)).toBe('1h 30m');
-      expect(formatDuration(45)).toBe('0h 0m 45s');
-      expect(formatDuration(7265)).toBe('2h 1m');
-    });
-  });
-});
-
-describe('Analytics Cache Management', () => {
+describe('Analytics Error Handling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should cache analytics data in React Query', async () => {
-    // This would be tested with React Query's cache inspection
-    (api.get as ReturnType<typeof vi.fn>).mockResolvedValue({ data: {} });
+  it('should handle network errors gracefully', async () => {
+    (api.get as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
 
     const { analyticsService } = await import('../analytics.service');
-    
-    // First call
-    await analyticsService.getTrends('7d');
-    
-    // Verify the service was called
-    expect(api.get).toHaveBeenCalledTimes(1);
+
+    await expect(analyticsService.getDashboard()).rejects.toThrow('Network error');
   });
 
-  it('should invalidate cache on demand', async () => {
+  it('should handle 401 unauthorized errors', async () => {
+    const unauthorizedError = new Error('Unauthorized');
+    (unauthorizedError as Error & { response?: { status: number } }).response = { status: 401 };
+    (api.get as ReturnType<typeof vi.fn>).mockRejectedValueOnce(unauthorizedError);
+
     const { analyticsService } = await import('../analytics.service');
-    
-    // If the service has invalidation method
-    if (typeof analyticsService.invalidateCache === 'function') {
-      await analyticsService.invalidateCache();
-    }
+
+    await expect(analyticsService.getTrends()).rejects.toThrow('Unauthorized');
+  });
+
+  it('should handle 500 server errors', async () => {
+    const serverError = new Error('Internal Server Error');
+    (serverError as Error & { response?: { status: number } }).response = { status: 500 };
+    (api.get as ReturnType<typeof vi.fn>).mockRejectedValueOnce(serverError);
+
+    const { analyticsService } = await import('../analytics.service');
+
+    await expect(analyticsService.getWeakAreas()).rejects.toThrow('Internal Server Error');
   });
 });

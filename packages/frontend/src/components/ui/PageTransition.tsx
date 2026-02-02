@@ -1,7 +1,15 @@
 import * as React from 'react';
+
 import { cn } from '@/utils/cn';
 
-type TransitionType = 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'scale' | 'none';
+type TransitionType =
+  | 'fade'
+  | 'slide-left'
+  | 'slide-right'
+  | 'slide-up'
+  | 'slide-down'
+  | 'scale'
+  | 'none';
 
 interface PageTransitionProps {
   /** Children to render */
@@ -84,11 +92,7 @@ const PageTransition: React.FC<PageTransitionProps> = ({
 
   return (
     <div
-      className={cn(
-        'transition-all',
-        isAnimating ? transition.enter : transition.base,
-        className
-      )}
+      className={cn('transition-all', isAnimating ? transition.enter : transition.base, className)}
       style={{
         animationDuration: `${duration}ms`,
         animationDelay: `${delay}ms`,
@@ -199,11 +203,7 @@ const AnimateOnScroll: React.FC<AnimateOnScrollProps> = ({
   return (
     <div
       ref={ref}
-      className={cn(
-        'transition-all',
-        isVisible ? transition.enter : transition.base,
-        className
-      )}
+      className={cn('transition-all', isVisible ? transition.enter : transition.base, className)}
       style={{
         animationDuration: `${duration}ms`,
         animationFillMode: 'forwards',
@@ -226,12 +226,7 @@ interface CollapseProps {
   className?: string;
 }
 
-const Collapse: React.FC<CollapseProps> = ({
-  open,
-  children,
-  duration = 300,
-  className,
-}) => {
+const Collapse: React.FC<CollapseProps> = ({ open, children, duration = 300, className }) => {
   const contentRef = React.useRef<HTMLDivElement>(null);
   const [height, setHeight] = React.useState<number | 'auto'>(open ? 'auto' : 0);
 
@@ -268,10 +263,5 @@ const Collapse: React.FC<CollapseProps> = ({
   );
 };
 
-export {
-  PageTransition,
-  StaggeredList,
-  AnimateOnScroll,
-  Collapse,
-};
+export { PageTransition, StaggeredList, AnimateOnScroll, Collapse };
 export type { PageTransitionProps, TransitionType };

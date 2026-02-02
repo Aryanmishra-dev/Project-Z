@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+
 import { useAuthStore } from '@/stores/authStore';
 import { API_BASE_URL } from '@/utils/constants';
 
@@ -132,14 +133,20 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
   }, []);
 
   // Join a room
-  const joinRoom = useCallback((room: string) => {
-    emit('join:room', { room });
-  }, [emit]);
+  const joinRoom = useCallback(
+    (room: string) => {
+      emit('join:room', { room });
+    },
+    [emit]
+  );
 
   // Leave a room
-  const leaveRoom = useCallback((room: string) => {
-    emit('leave:room', { room });
-  }, [emit]);
+  const leaveRoom = useCallback(
+    (room: string) => {
+      emit('leave:room', { room });
+    },
+    [emit]
+  );
 
   // Auto-connect on mount if enabled
   useEffect(() => {

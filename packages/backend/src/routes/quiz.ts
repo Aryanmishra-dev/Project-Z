@@ -1,6 +1,7 @@
+import path from 'path';
+
 import { Router } from 'express';
 import multer from 'multer';
-import path from 'path';
 
 export const quizRouter = Router();
 
@@ -16,7 +17,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: (parseInt(process.env.MAX_FILE_SIZE_MB || '10')) * 1024 * 1024,
+    fileSize: parseInt(process.env.MAX_FILE_SIZE_MB || '10') * 1024 * 1024,
   },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype === 'application/pdf') {

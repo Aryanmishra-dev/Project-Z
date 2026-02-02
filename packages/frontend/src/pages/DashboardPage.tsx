@@ -1,29 +1,26 @@
+import { useQuery } from '@tanstack/react-query';
+import { FileText, HelpCircle, Target, Clock, Upload, Play, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import {
-  FileText,
-  HelpCircle,
-  Target,
-  Clock,
-  Upload,
-  Play,
-  TrendingUp,
-} from 'lucide-react';
-import { Button, Card, CardContent, Spinner, Badge } from '@/components/ui';
+
 import { StatsCard } from '@/components/features/analytics';
 import { QuizConfig } from '@/components/features/quiz';
+import { Button, Card, CardContent, Spinner, Badge } from '@/components/ui';
 import { analyticsService } from '@/services';
 import { useAuthStore } from '@/stores/authStore';
-import { formatRelativeTime } from '@/utils/formatters';
-import { ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/cn';
+import { ROUTES } from '@/utils/constants';
+import { formatRelativeTime } from '@/utils/formatters';
 
 export function DashboardPage() {
   const { user } = useAuthStore();
   const [showQuizConfig, setShowQuizConfig] = useState(false);
 
-  const { data: stats, isLoading, isError } = useQuery({
+  const {
+    data: stats,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => analyticsService.getDashboard(),
   });
@@ -52,9 +49,7 @@ export function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900">
             Welcome back, {user?.fullName?.split(' ')[0] || 'there'}! 👋
           </h1>
-          <p className="mt-1 text-gray-500">
-            Here's an overview of your learning progress
-          </p>
+          <p className="mt-1 text-gray-500">Here's an overview of your learning progress</p>
         </div>
         <div className="flex gap-3">
           <Link to={ROUTES.PDFS}>
@@ -111,9 +106,7 @@ export function DashboardPage() {
               <div className="mt-6 text-center py-8">
                 <p className="text-gray-500">No activity yet. Start by uploading a PDF!</p>
                 <Link to={ROUTES.PDFS}>
-                  <Button className="mt-4">
-                    Upload Your First PDF
-                  </Button>
+                  <Button className="mt-4">Upload Your First PDF</Button>
                 </Link>
               </div>
             ) : (
@@ -159,23 +152,19 @@ export function DashboardPage() {
         {/* PDF Status Breakdown */}
         <Card>
           <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900">
-              PDF Status Breakdown
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900">PDF Status Breakdown</h2>
             <div className="mt-6 space-y-4">
-              {([
+              {[
                 { label: 'Completed', value: stats.pdfs.completed, color: 'bg-success-500' },
                 { label: 'Pending', value: stats.pdfs.pending, color: 'bg-warning-500' },
                 { label: 'Failed', value: stats.pdfs.failed, color: 'bg-error-500' },
-              ]).map((item) => {
+              ].map((item) => {
                 const percentage = stats.pdfs.total > 0 ? (item.value / stats.pdfs.total) * 100 : 0;
 
                 return (
                   <div key={item.label} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-gray-700">
-                        {item.label}
-                      </span>
+                      <span className="font-medium text-gray-700">{item.label}</span>
                       <span className="text-gray-500">
                         {item.value}/{stats.pdfs.total} ({Math.round(percentage)}%)
                       </span>
@@ -223,10 +212,7 @@ export function DashboardPage() {
       </div>
 
       {/* Quiz Config Modal */}
-      <QuizConfig
-        open={showQuizConfig}
-        onOpenChange={setShowQuizConfig}
-      />
+      <QuizConfig open={showQuizConfig} onOpenChange={setShowQuizConfig} />
     </div>
   );
 }

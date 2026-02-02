@@ -4,7 +4,7 @@ export type { AuthStore } from './authStore';
 export { usePDFStore } from './pdfStore';
 export type { PDFStore } from './pdfStore';
 
-export { 
+export {
   useQuizStore,
   selectCurrentQuestion,
   selectProgress,

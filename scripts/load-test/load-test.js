@@ -1,8 +1,8 @@
 /**
  * K6 Load Testing Script for PDF Quiz Generator
- * 
+ *
  * Run with: k6 run scripts/load-test/load-test.js
- * 
+ *
  * Prerequisites:
  * 1. Install k6: brew install k6
  * 2. Start the application: pnpm dev
@@ -24,23 +24,23 @@ const apiLatency = new Trend('api_latency');
 export const options = {
   // Ramp-up pattern for load testing
   stages: [
-    { duration: '30s', target: 2 },   // Warm up: ramp to 2 users
-    { duration: '1m', target: 5 },    // Ramp up to 5 users
-    { duration: '2m', target: 5 },    // Stay at 5 users
-    { duration: '1m', target: 10 },   // Ramp up to 10 users
-    { duration: '3m', target: 10 },   // Stay at 10 users
-    { duration: '1m', target: 15 },   // Push to 15 users
-    { duration: '2m', target: 15 },   // Stay at 15 users
-    { duration: '1m', target: 0 },    // Ramp down
+    { duration: '30s', target: 2 }, // Warm up: ramp to 2 users
+    { duration: '1m', target: 5 }, // Ramp up to 5 users
+    { duration: '2m', target: 5 }, // Stay at 5 users
+    { duration: '1m', target: 10 }, // Ramp up to 10 users
+    { duration: '3m', target: 10 }, // Stay at 10 users
+    { duration: '1m', target: 15 }, // Push to 15 users
+    { duration: '2m', target: 15 }, // Stay at 15 users
+    { duration: '1m', target: 0 }, // Ramp down
   ],
 
   // Performance thresholds
   thresholds: {
-    http_req_duration: ['p(95)<500', 'p(99)<1000'],  // 95% under 500ms, 99% under 1s
-    http_req_failed: ['rate<0.01'],                  // Less than 1% failures
-    success_rate: ['rate>0.95'],                     // Over 95% success
-    api_latency: ['p(95)<400'],                      // API calls under 400ms
-    login_failures: ['count<5'],                     // Less than 5 login failures
+    http_req_duration: ['p(95)<500', 'p(99)<1000'], // 95% under 500ms, 99% under 1s
+    http_req_failed: ['rate<0.01'], // Less than 1% failures
+    success_rate: ['rate>0.95'], // Over 95% success
+    api_latency: ['p(95)<400'], // API calls under 400ms
+    login_failures: ['count<5'], // Less than 5 login failures
   },
 };
 
@@ -64,13 +64,13 @@ function getTestUser() {
 // Setup function - runs once before tests
 export function setup() {
   console.log('Starting load test against', BASE_URL);
-  
+
   // Verify API is responding
   const healthCheck = http.get(`${API_URL}/health`);
   if (healthCheck.status !== 200) {
     throw new Error('API health check failed');
   }
-  
+
   return { timestamp: new Date().toISOString() };
 }
 
@@ -247,14 +247,10 @@ export default function () {
         difficulty: 'medium',
       });
 
-      const createSessionRes = http.post(
-        `${API_URL}/quiz-sessions`,
-        createSessionPayload,
-        {
-          headers: authHeaders,
-          tags: { name: 'create_session' },
-        }
-      );
+      const createSessionRes = http.post(`${API_URL}/quiz-sessions`, createSessionPayload, {
+        headers: authHeaders,
+        tags: { name: 'create_session' },
+      });
 
       let sessionId = null;
       let questions = [];
@@ -284,14 +280,10 @@ export default function () {
 
         const submitPayload = JSON.stringify({ answers });
 
-        const submitRes = http.post(
-          `${API_URL}/quiz-sessions/${sessionId}/submit`,
-          submitPayload,
-          {
-            headers: authHeaders,
-            tags: { name: 'submit_quiz' },
-          }
-        );
+        const submitRes = http.post(`${API_URL}/quiz-sessions/${sessionId}/submit`, submitPayload, {
+          headers: authHeaders,
+          tags: { name: 'submit_quiz' },
+        });
 
         const quizSubmitted = check(submitRes, {
           'quiz submitted': (r) => r.status === 200,
@@ -339,14 +331,10 @@ export default function () {
 
   // Scenario 6: Logout
   group('Logout', () => {
-    const logoutRes = http.post(
-      `${API_URL}/auth/logout`,
-      JSON.stringify({}),
-      {
-        headers: authHeaders,
-        tags: { name: 'logout' },
-      }
-    );
+    const logoutRes = http.post(`${API_URL}/auth/logout`, JSON.stringify({}), {
+      headers: authHeaders,
+      tags: { name: 'logout' },
+    });
 
     check(logoutRes, {
       'logout successful': (r) => r.status === 200 || r.status === 204,
@@ -366,14 +354,14 @@ export function teardown(data) {
 
 /**
  * Results Summary (Expected):
- * 
+ *
  * ✓ http_req_duration.............: avg=150ms   min=50ms   med=120ms  max=800ms  p(90)=300ms  p(95)=450ms
  * ✓ http_req_failed...............: 0.50%  ✓ (threshold: <1%)
  * ✓ success_rate..................: 95.50% ✓ (threshold: >95%)
  * ✓ api_latency...................: avg=130ms  p(95)=350ms ✓ (threshold: <400ms)
  * ✓ quiz_completions..............: 150
  * ✓ login_failures................: 2      ✓ (threshold: <5)
- * 
+ *
  * Running 10 concurrent users for 10 minutes should result in:
  * - ~600 total iterations
  * - ~2400 HTTP requests

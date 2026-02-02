@@ -4,8 +4,9 @@
  * Run with: npx tsx src/db/migrations/add-performance-indexes.ts
  */
 import { sql } from 'drizzle-orm';
-import { db } from '../index';
+
 import { logger } from '../../utils/logger';
+import { db } from '../index';
 
 async function addPerformanceIndexes() {
   logger.info('Starting performance indexes migration...');

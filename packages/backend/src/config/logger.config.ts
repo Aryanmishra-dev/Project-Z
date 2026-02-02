@@ -1,6 +1,6 @@
 /**
  * Logging Configuration
- * 
+ *
  * Centralized logging with rotation, compression, and structured output.
  * - All logs stored in `logs/` directory
  * - Daily rotation, 30-day retention
@@ -185,7 +185,11 @@ export const logAudit = (action: string, userId: string, details?: Record<string
 };
 
 // Log security events
-export const logSecurity = (event: string, severity: 'low' | 'medium' | 'high' | 'critical', details?: Record<string, any>) => {
+export const logSecurity = (
+  event: string,
+  severity: 'low' | 'medium' | 'high' | 'critical',
+  details?: Record<string, any>
+) => {
   const logLevel = severity === 'critical' || severity === 'high' ? 'error' : 'warn';
   logger[logLevel]('Security event', {
     type: 'security',
@@ -197,7 +201,11 @@ export const logSecurity = (event: string, severity: 'low' | 'medium' | 'high' |
 };
 
 // Log performance metrics
-export const logPerformance = (operation: string, durationMs: number, details?: Record<string, any>) => {
+export const logPerformance = (
+  operation: string,
+  durationMs: number,
+  details?: Record<string, any>
+) => {
   const level = durationMs > 1000 ? 'warn' : 'debug';
   logger[level]('Performance metric', {
     type: 'performance',
@@ -209,7 +217,9 @@ export const logPerformance = (operation: string, durationMs: number, details?: 
 };
 
 // Monitor error logs for critical issues
-export const setupErrorLogMonitoring = (onCriticalError: (message: string, details: any) => void) => {
+export const setupErrorLogMonitoring = (
+  onCriticalError: (message: string, details: any) => void
+) => {
   const errorPatterns = [
     /database connection failed/i,
     /redis connection failed/i,
@@ -226,7 +236,7 @@ export const setupErrorLogMonitoring = (onCriticalError: (message: string, detai
     if (info.level === 'error') {
       const message = info.message || '';
       const isCritical = errorPatterns.some((pattern) => pattern.test(message));
-      
+
       if (isCritical) {
         onCriticalError(message, info);
       }

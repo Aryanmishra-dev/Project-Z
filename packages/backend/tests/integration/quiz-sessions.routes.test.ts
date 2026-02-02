@@ -1,27 +1,30 @@
 /**
  * Quiz Sessions Routes Integration Tests
  */
-import { describe, it, expect, vi, beforeAll } from 'vitest';
-import request from 'supertest';
-import { createApp } from '../../src/app';
 import { Express } from 'express';
+import request from 'supertest';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
+
+import { createApp } from '../../src/app';
 
 // Mock dependencies
 vi.mock('../../src/db', () => ({
   db: {
     insert: vi.fn().mockReturnValue({
       values: vi.fn().mockReturnValue({
-        returning: vi.fn().mockResolvedValue([{
-          id: 'test-session-id',
-          userId: 'test-user-id',
-          pdfId: 'test-pdf-id',
-          totalQuestions: 10,
-          correctAnswers: 0,
-          status: 'in_progress',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          startedAt: new Date(),
-        }]),
+        returning: vi.fn().mockResolvedValue([
+          {
+            id: 'test-session-id',
+            userId: 'test-user-id',
+            pdfId: 'test-pdf-id',
+            totalQuestions: 10,
+            correctAnswers: 0,
+            status: 'in_progress',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            startedAt: new Date(),
+          },
+        ]),
       }),
     }),
     select: vi.fn().mockReturnValue({
@@ -74,7 +77,7 @@ vi.mock('../../src/middleware/auth', async () => {
 
 describe('Quiz Sessions Routes', () => {
   let app: Express;
-  
+
   beforeAll(() => {
     app = createApp();
   });
@@ -104,9 +107,9 @@ describe('Quiz Sessions Routes', () => {
       const response = await request(app)
         .post('/api/v1/quiz-sessions')
         .set('Authorization', 'Bearer test-token')
-        .send({ 
+        .send({
           pdfId: '550e8400-e29b-41d4-a716-446655440000',
-          questionCount: 100 // Max is 50
+          questionCount: 100, // Max is 50
         })
         .expect(400);
 
@@ -117,9 +120,9 @@ describe('Quiz Sessions Routes', () => {
       const response = await request(app)
         .post('/api/v1/quiz-sessions')
         .set('Authorization', 'Bearer test-token')
-        .send({ 
+        .send({
           pdfId: '550e8400-e29b-41d4-a716-446655440000',
-          difficulty: 'invalid'
+          difficulty: 'invalid',
         })
         .expect(400);
 
@@ -186,7 +189,7 @@ describe('Quiz Sessions Routes', () => {
         .set('Authorization', 'Bearer test-token')
         .send({
           questionId: '550e8400-e29b-41d4-a716-446655440000',
-          selectedOption: 'E' // Invalid
+          selectedOption: 'E', // Invalid
         })
         .expect(400);
 

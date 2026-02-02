@@ -1,7 +1,9 @@
 import 'dotenv/config';
-import { db } from './index';
-import { logger } from '../utils/logger';
 import { sql } from 'drizzle-orm';
+
+import { logger } from '../utils/logger';
+
+import { db } from './index';
 
 /**
  * Run database migrations
@@ -194,6 +196,7 @@ async function migrate() {
     `);
 
     logger.info('✅ Migrations completed successfully');
+    process.exit(0);
   } catch (error) {
     logger.error('Migration failed:', error);
     process.exit(1);

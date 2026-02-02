@@ -1,11 +1,13 @@
-import { Link } from 'react-router-dom';
 import { Trophy, Clock, Target, RefreshCw, BarChart3, ArrowLeft } from 'lucide-react';
-import { Button, Card, CardContent, Badge, Progress } from '@/components/ui';
+import { Link } from 'react-router-dom';
+
 import { QuestionCard } from './QuestionCard';
-import { formatDuration, formatScore } from '@/utils/formatters';
-import { getPerformanceBadge, DIFFICULTY_CONFIG, ROUTES } from '@/utils/constants';
-import { cn } from '@/utils/cn';
+
+import { Button, Card, CardContent, Badge, Progress } from '@/components/ui';
 import type { QuizResults as QuizResultsType } from '@/types';
+import { cn } from '@/utils/cn';
+import { getPerformanceBadge, DIFFICULTY_CONFIG, ROUTES } from '@/utils/constants';
+import { formatDuration, formatScore } from '@/utils/formatters';
 
 interface QuizResultsProps {
   results: QuizResultsType;
@@ -20,7 +22,13 @@ export function QuizResults({ results }: QuizResultsProps) {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-4xl px-4">
         {/* Hero section */}
-        <Card className={cn('mb-8 overflow-hidden', performanceBadge.bgColor, performanceBadge.borderColor)}>
+        <Card
+          className={cn(
+            'mb-8 overflow-hidden',
+            performanceBadge.bgColor,
+            performanceBadge.borderColor
+          )}
+        >
           <CardContent className="py-8 text-center">
             <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-md">
               <Trophy className={cn('h-10 w-10', performanceBadge.color)} />
@@ -28,10 +36,16 @@ export function QuizResults({ results }: QuizResultsProps) {
             <div className={cn('text-5xl font-bold', performanceBadge.color)}>
               {formatScore(scorePercentage)}
             </div>
-            <Badge className="mt-2" variant={
-              performanceBadge.label === 'Excellent' ? 'success' :
-              performanceBadge.label === 'Good' ? 'info' : 'warning'
-            }>
+            <Badge
+              className="mt-2"
+              variant={
+                performanceBadge.label === 'Excellent'
+                  ? 'success'
+                  : performanceBadge.label === 'Good'
+                    ? 'info'
+                    : 'warning'
+              }
+            >
               {performanceBadge.label}
             </Badge>
             <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-600">
@@ -52,9 +66,7 @@ export function QuizResults({ results }: QuizResultsProps) {
         {/* Breakdown by difficulty */}
         <Card className="mb-8">
           <CardContent className="py-6">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900">
-              Performance by Difficulty
-            </h3>
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">Performance by Difficulty</h3>
             <div className="grid gap-4 sm:grid-cols-3">
               {(['easy', 'medium', 'hard'] as const).map((diff) => {
                 const data = breakdown[diff];
@@ -64,9 +76,11 @@ export function QuizResults({ results }: QuizResultsProps) {
                 return (
                   <div key={diff} className="rounded-lg bg-gray-50 p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant={
-                        diff === 'easy' ? 'success' : diff === 'medium' ? 'warning' : 'error'
-                      }>
+                      <Badge
+                        variant={
+                          diff === 'easy' ? 'success' : diff === 'medium' ? 'warning' : 'error'
+                        }
+                      >
                         {config.label}
                       </Badge>
                       <span className="text-sm font-medium text-gray-700">
@@ -90,9 +104,7 @@ export function QuizResults({ results }: QuizResultsProps) {
         {/* Question review */}
         <Card className="mb-8">
           <CardContent className="py-6">
-            <h3 className="mb-6 text-lg font-semibold text-gray-900">
-              Question Review
-            </h3>
+            <h3 className="mb-6 text-lg font-semibold text-gray-900">Question Review</h3>
             <div className="space-y-8">
               {questions.map((question, index) => {
                 const userAnswer = question.userAnswer;
@@ -103,7 +115,9 @@ export function QuizResults({ results }: QuizResultsProps) {
                     key={question.id}
                     className={cn(
                       'rounded-lg border-2 p-4',
-                      isCorrect ? 'border-success-200 bg-success-50/30' : 'border-error-200 bg-error-50/30'
+                      isCorrect
+                        ? 'border-success-200 bg-success-50/30'
+                        : 'border-error-200 bg-error-50/30'
                     )}
                   >
                     <div className="mb-4 flex items-center justify-between">

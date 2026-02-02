@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { LoginForm } from '../LoginForm';
+
 import * as authStore from '@/stores/authStore';
 
 // Mock the auth store
@@ -41,7 +43,7 @@ describe('LoginForm', () => {
     render(<LoginForm />, { wrapper: createWrapper() });
 
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
   });
 
   it('renders submit button', () => {
@@ -67,12 +69,13 @@ describe('LoginForm', () => {
 
     const emailInput = screen.getByLabelText(/email/i);
     await user.type(emailInput, 'invalid-email');
+    await user.tab(); // Ensure blur
 
     const submitButton = screen.getByRole('button', { name: /sign in/i });
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
+      expect(screen.getByText(/invalid email format/i)).toBeInTheDocument();
     });
   });
 
@@ -82,7 +85,7 @@ describe('LoginForm', () => {
     render(<LoginForm />, { wrapper: createWrapper() });
 
     const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
 
     await user.type(emailInput, 'test@example.com');
     await user.type(passwordInput, 'password123');
@@ -101,7 +104,10 @@ describe('LoginForm', () => {
   it('has link to register page', () => {
     render(<LoginForm />, { wrapper: createWrapper() });
     expect(screen.getByText(/don't have an account/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /sign up/i })).toHaveAttribute('href', '/register');
+    expect(screen.getByRole('link', { name: /sign up|register/i })).toHaveAttribute(
+      'href',
+      '/register'
+    );
   });
 
   it('shows loading state during submission', () => {
@@ -111,7 +117,7 @@ describe('LoginForm', () => {
     } as any);
 
     render(<LoginForm />, { wrapper: createWrapper() });
-    
+
     const submitButton = screen.getByRole('button', { name: /sign in/i });
     expect(submitButton).toBeDisabled();
   });
@@ -120,7 +126,7 @@ describe('LoginForm', () => {
     const user = userEvent.setup();
     render(<LoginForm />, { wrapper: createWrapper() });
 
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
     expect(passwordInput).toHaveAttribute('type', 'password');
 
     // Find and click the toggle button

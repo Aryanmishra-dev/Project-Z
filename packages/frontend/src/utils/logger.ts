@@ -41,7 +41,7 @@ class FrontendLogger {
 
   constructor(config: Partial<LoggerConfig> = {}) {
     const isDev = import.meta.env.DEV;
-    
+
     this.config = {
       minLevel: isDev ? 'debug' : 'warn',
       enableConsole: true,
@@ -56,7 +56,11 @@ class FrontendLogger {
     return LOG_LEVELS[level] >= LOG_LEVELS[this.config.minLevel];
   }
 
-  private formatMessage(level: LogLevel, message: string, context?: Record<string, unknown>): LogEntry {
+  private formatMessage(
+    level: LogLevel,
+    message: string,
+    context?: Record<string, unknown>
+  ): LogEntry {
     return {
       level,
       message,
@@ -73,15 +77,15 @@ class FrontendLogger {
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
 
     console.groupCollapsed(`%c${prefix} ${message}`, color);
-    
+
     if (context && Object.keys(context).length > 0) {
       console.log('Context:', context);
     }
-    
+
     if (error) {
       console.error('Error:', error);
     }
-    
+
     console.groupEnd();
   }
 
@@ -136,7 +140,7 @@ class FrontendLogger {
   error(message: string, error?: Error | unknown, context?: Record<string, unknown>) {
     const errorObj = error instanceof Error ? error : undefined;
     const errorContext = error && !(error instanceof Error) ? { errorData: error } : {};
-    
+
     this.log('error', message, { ...context, ...errorContext }, errorObj);
   }
 

@@ -25,8 +25,8 @@ class Settings(BaseSettings):
     
     # Ollama LLM Configuration
     ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "mistral:7b-instruct-q4_K_M"
-    ollama_timeout: int = 30
+    ollama_model: str = "mistral:latest"
+    ollama_timeout: int = 120
     ollama_max_retries: int = 3
     
     # LLM Parameters
