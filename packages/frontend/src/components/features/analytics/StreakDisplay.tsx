@@ -1,9 +1,10 @@
+import { format, subDays } from 'date-fns';
+import { Flame, Trophy, Zap, Calendar, Target } from 'lucide-react';
+import { useMemo } from 'react';
+
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 import { StreaksData } from '@/services/analytics.service';
-import { Flame, Trophy, Zap, Calendar, Target } from 'lucide-react';
 import { cn } from '@/utils/cn';
-import { useMemo } from 'react';
-import { format, subDays } from 'date-fns';
 
 interface StreakDisplayProps {
   data: StreaksData;
@@ -37,7 +38,10 @@ const MilestoneProgress = ({
     </div>
     <div className="h-2 overflow-hidden rounded-full bg-gray-100">
       <div
-        className={cn('h-full rounded-full transition-all duration-500', color.replace('text-', 'bg-'))}
+        className={cn(
+          'h-full rounded-full transition-all duration-500',
+          color.replace('text-', 'bg-')
+        )}
         style={{ width: `${Math.min(100, progress)}%` }}
       />
     </div>
@@ -49,7 +53,7 @@ export function StreakDisplay({ data, isLoading }: StreakDisplayProps) {
   const calendarData = useMemo(() => {
     const today = new Date();
     const days: { date: Date; hasActivity: boolean }[] = [];
-    
+
     for (let i = 89; i >= 0; i--) {
       const date = subDays(today, i);
       const dateStr = format(date, 'yyyy-MM-dd');
@@ -58,7 +62,7 @@ export function StreakDisplay({ data, isLoading }: StreakDisplayProps) {
         hasActivity: data.streakDates.includes(dateStr),
       });
     }
-    
+
     return days;
   }, [data.streakDates]);
 
@@ -66,7 +70,7 @@ export function StreakDisplay({ data, isLoading }: StreakDisplayProps) {
   // const weeks = useMemo(() => {
   //   const result: typeof calendarData[] = [];
   //   let currentWeek: typeof calendarData = [];
-  //   
+  //
   //   calendarData.forEach((day, index) => {
   //     currentWeek.push(day);
   //     if (currentWeek.length === 7 || index === calendarData.length - 1) {
@@ -74,7 +78,7 @@ export function StreakDisplay({ data, isLoading }: StreakDisplayProps) {
   //       currentWeek = [];
   //     }
   //   });
-  //   
+  //
   //   return result;
   // }, [calendarData]);
 

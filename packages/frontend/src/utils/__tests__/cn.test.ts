@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { cn } from '../cn';
 
 describe('cn', () => {
@@ -36,10 +37,12 @@ describe('cn', () => {
   it('handles complex Tailwind patterns', () => {
     // Padding merge
     expect(cn('p-4', 'px-2')).toBe('p-4 px-2');
-    
+
     // Color variants
-    expect(cn('bg-red-500', 'hover:bg-red-600', 'hover:bg-blue-600')).toBe('bg-red-500 hover:bg-blue-600');
-    
+    expect(cn('bg-red-500', 'hover:bg-red-600', 'hover:bg-blue-600')).toBe(
+      'bg-red-500 hover:bg-blue-600'
+    );
+
     // Responsive classes
     expect(cn('w-full', 'md:w-1/2', 'md:w-1/3')).toBe('w-full md:w-1/3');
   });

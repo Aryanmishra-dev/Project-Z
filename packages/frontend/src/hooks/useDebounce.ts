@@ -49,10 +49,7 @@ export function useDebounce<T extends (...args: Parameters<T>) => void>(
 export function useDebouncedValue<T>(value: T, delay: number = 300): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  const [debouncedSetter] = useDebounce(
-    (newValue: T) => setDebouncedValue(newValue),
-    { delay }
-  );
+  const [debouncedSetter] = useDebounce((newValue: T) => setDebouncedValue(newValue), { delay });
 
   // Update debounced value when input value changes
   debouncedSetter(value);

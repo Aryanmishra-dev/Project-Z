@@ -1,12 +1,13 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { z } from 'zod';
+
 import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui';
-import { useAuthStore } from '@/stores/authStore';
 import { getErrorMessage } from '@/lib/api';
+import { useAuthStore } from '@/stores/authStore';
 import { ROUTES } from '@/utils/constants';
 
 const loginSchema = z.object({
@@ -58,12 +59,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         <CardDescription>Sign in to your account to continue</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           {error && (
-            <div
-              className="rounded-md bg-error-50 p-3 text-sm text-error-700"
-              role="alert"
-            >
+            <div className="rounded-md bg-error-50 p-3 text-sm text-error-700" role="alert">
               {error}
             </div>
           )}
@@ -127,10 +125,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           </div>
 
           <div className="flex items-center justify-end">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-primary-600 hover:text-primary-700"
-            >
+            <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700">
               Forgot password?
             </Link>
           </div>

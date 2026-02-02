@@ -1,11 +1,12 @@
-import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle } from 'lucide-react';
-import { Spinner, Button } from '@/components/ui';
+import { useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+
 import { QuizResults } from '@/components/features/quiz';
+import { Spinner, Button } from '@/components/ui';
 import { quizService } from '@/services';
 import { useQuizStore } from '@/stores/quizStore';
-import { useEffect } from 'react';
 import { ROUTES } from '@/utils/constants';
 
 export function QuizResultsPage() {
@@ -17,7 +18,12 @@ export function QuizResultsPage() {
     clearQuiz();
   }, [clearQuiz]);
 
-  const { data: results, isLoading, isError, error } = useQuery({
+  const {
+    data: results,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['quiz-results', sessionId],
     queryFn: () => quizService.getResults(sessionId!),
     enabled: !!sessionId,

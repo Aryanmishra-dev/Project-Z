@@ -4,10 +4,8 @@
  */
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
-import { 
-  AppError, 
-  ValidationError, 
-} from '../utils/errors';
+
+import { AppError, ValidationError } from '../utils/errors';
 import { logger, getRequestId } from '../utils/logger';
 
 /**
@@ -28,7 +26,7 @@ export interface ErrorResponse {
  */
 function formatZodError(error: ZodError): ValidationError {
   const fieldErrors: Record<string, string[]> = {};
-  
+
   for (const issue of error.errors) {
     const path = issue.path.join('.') || '_root';
     if (!fieldErrors[path]) {
@@ -36,7 +34,7 @@ function formatZodError(error: ZodError): ValidationError {
     }
     fieldErrors[path].push(issue.message);
   }
-  
+
   return new ValidationError('Validation failed', fieldErrors);
 }
 
@@ -44,12 +42,7 @@ function formatZodError(error: ZodError): ValidationError {
  * Global error handler middleware
  * Must be registered last in the middleware chain
  */
-export function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-): void {
+export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction): void {
   const requestId = getRequestId();
 
   // Handle Zod validation errors
@@ -111,9 +104,7 @@ export function errorHandler(
   });
 
   // Don't expose internal error details in production
-  const message = process.env.NODE_ENV === 'production'
-    ? 'Internal server error'
-    : err.message;
+  const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message;
 
   const response: ErrorResponse = {
     success: false,
@@ -131,13 +122,9 @@ export function errorHandler(
  * 404 Not Found handler
  * Use this for unmatched routes
  */
-export function notFoundHandler(
-  req: Request,
-  res: Response,
-  _next: NextFunction
-): void {
+export function notFoundHandler(req: Request, res: Response, _next: NextFunction): void {
   const requestId = getRequestId();
-  
+
   logger.debug('Route not found', {
     path: req.path,
     method: req.method,

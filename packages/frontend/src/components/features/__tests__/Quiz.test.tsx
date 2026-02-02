@@ -2,11 +2,11 @@
  * Quiz Component Unit Tests
  * Tests for quiz taking, timer, and submission functionality
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock services
 vi.mock('../../services/quiz.service', () => ({
@@ -28,22 +28,21 @@ vi.mock('../../hooks/useWebSocket', () => ({
   })),
 }));
 
-const createTestQueryClient = () => new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      gcTime: 0,
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
     },
-  },
-});
+  });
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = createTestQueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {children}
-      </BrowserRouter>
+      <BrowserRouter>{children}</BrowserRouter>
     </QueryClientProvider>
   );
 };
@@ -73,11 +72,11 @@ describe('Quiz Components', () => {
     it('should render question text', async () => {
       // Import and render component
       const { QuizQuestion } = await import('../../components/features/quiz/QuizQuestion');
-      
+
       render(
         <TestWrapper>
-          <QuizQuestion 
-            question={mockQuestion} 
+          <QuizQuestion
+            question={mockQuestion}
             selectedOption={null}
             onSelectOption={vi.fn()}
             showAnswer={false}
@@ -90,11 +89,11 @@ describe('Quiz Components', () => {
 
     it('should render all answer options', async () => {
       const { QuizQuestion } = await import('../../components/features/quiz/QuizQuestion');
-      
+
       render(
         <TestWrapper>
-          <QuizQuestion 
-            question={mockQuestion} 
+          <QuizQuestion
+            question={mockQuestion}
             selectedOption={null}
             onSelectOption={vi.fn()}
             showAnswer={false}
@@ -111,11 +110,11 @@ describe('Quiz Components', () => {
     it('should call onSelectOption when an option is clicked', async () => {
       const onSelectOption = vi.fn();
       const { QuizQuestion } = await import('../../components/features/quiz/QuizQuestion');
-      
+
       render(
         <TestWrapper>
-          <QuizQuestion 
-            question={mockQuestion} 
+          <QuizQuestion
+            question={mockQuestion}
             selectedOption={null}
             onSelectOption={onSelectOption}
             showAnswer={false}
@@ -131,11 +130,11 @@ describe('Quiz Components', () => {
 
     it('should highlight selected option', async () => {
       const { QuizQuestion } = await import('../../components/features/quiz/QuizQuestion');
-      
+
       render(
         <TestWrapper>
-          <QuizQuestion 
-            question={mockQuestion} 
+          <QuizQuestion
+            question={mockQuestion}
             selectedOption="B"
             onSelectOption={vi.fn()}
             showAnswer={false}
@@ -154,11 +153,11 @@ describe('Quiz Components', () => {
       };
 
       const { QuizQuestion } = await import('../../components/features/quiz/QuizQuestion');
-      
+
       render(
         <TestWrapper>
-          <QuizQuestion 
-            question={questionWithAnswer} 
+          <QuizQuestion
+            question={questionWithAnswer}
             selectedOption="A"
             onSelectOption={vi.fn()}
             showAnswer={true}
@@ -177,11 +176,11 @@ describe('Quiz Components', () => {
 
     it('should disable options when showAnswer is true', async () => {
       const { QuizQuestion } = await import('../../components/features/quiz/QuizQuestion');
-      
+
       render(
         <TestWrapper>
-          <QuizQuestion 
-            question={mockQuestion} 
+          <QuizQuestion
+            question={mockQuestion}
             selectedOption="B"
             onSelectOption={vi.fn()}
             showAnswer={true}
@@ -190,7 +189,7 @@ describe('Quiz Components', () => {
       );
 
       const options = screen.getAllByRole('button');
-      options.forEach(option => {
+      options.forEach((option) => {
         expect(option).toBeDisabled();
       });
     });
@@ -198,11 +197,11 @@ describe('Quiz Components', () => {
     it('should support keyboard navigation', async () => {
       const onSelectOption = vi.fn();
       const { QuizQuestion } = await import('../../components/features/quiz/QuizQuestion');
-      
+
       render(
         <TestWrapper>
-          <QuizQuestion 
-            question={mockQuestion} 
+          <QuizQuestion
+            question={mockQuestion}
             selectedOption={null}
             onSelectOption={onSelectOption}
             showAnswer={false}
@@ -223,14 +222,10 @@ describe('Quiz Components', () => {
   describe('QuizTimer Component', () => {
     it('should display remaining time', async () => {
       const { QuizTimer } = await import('../../components/features/quiz/QuizTimer');
-      
+
       render(
         <TestWrapper>
-          <QuizTimer 
-            totalSeconds={3600} 
-            remainingSeconds={1800}
-            onTimeout={vi.fn()}
-          />
+          <QuizTimer totalSeconds={3600} remainingSeconds={1800} onTimeout={vi.fn()} />
         </TestWrapper>
       );
 
@@ -240,14 +235,10 @@ describe('Quiz Components', () => {
 
     it('should count down every second', async () => {
       const { QuizTimer } = await import('../../components/features/quiz/QuizTimer');
-      
+
       const { rerender } = render(
         <TestWrapper>
-          <QuizTimer 
-            totalSeconds={3600} 
-            remainingSeconds={60}
-            onTimeout={vi.fn()}
-          />
+          <QuizTimer totalSeconds={3600} remainingSeconds={60} onTimeout={vi.fn()} />
         </TestWrapper>
       );
 
@@ -260,11 +251,7 @@ describe('Quiz Components', () => {
 
       rerender(
         <TestWrapper>
-          <QuizTimer 
-            totalSeconds={3600} 
-            remainingSeconds={59}
-            onTimeout={vi.fn()}
-          />
+          <QuizTimer totalSeconds={3600} remainingSeconds={59} onTimeout={vi.fn()} />
         </TestWrapper>
       );
 
@@ -274,14 +261,10 @@ describe('Quiz Components', () => {
     it('should call onTimeout when time expires', async () => {
       const onTimeout = vi.fn();
       const { QuizTimer } = await import('../../components/features/quiz/QuizTimer');
-      
+
       const { rerender } = render(
         <TestWrapper>
-          <QuizTimer 
-            totalSeconds={3600} 
-            remainingSeconds={1}
-            onTimeout={onTimeout}
-          />
+          <QuizTimer totalSeconds={3600} remainingSeconds={1} onTimeout={onTimeout} />
         </TestWrapper>
       );
 
@@ -292,11 +275,7 @@ describe('Quiz Components', () => {
 
       rerender(
         <TestWrapper>
-          <QuizTimer 
-            totalSeconds={3600} 
-            remainingSeconds={0}
-            onTimeout={onTimeout}
-          />
+          <QuizTimer totalSeconds={3600} remainingSeconds={0} onTimeout={onTimeout} />
         </TestWrapper>
       );
 
@@ -305,11 +284,11 @@ describe('Quiz Components', () => {
 
     it('should show warning color when time is low', async () => {
       const { QuizTimer } = await import('../../components/features/quiz/QuizTimer');
-      
+
       render(
         <TestWrapper>
-          <QuizTimer 
-            totalSeconds={3600} 
+          <QuizTimer
+            totalSeconds={3600}
             remainingSeconds={60} // 1 minute left
             onTimeout={vi.fn()}
             warningThreshold={120}
@@ -323,11 +302,11 @@ describe('Quiz Components', () => {
 
     it('should show critical color when time is very low', async () => {
       const { QuizTimer } = await import('../../components/features/quiz/QuizTimer');
-      
+
       render(
         <TestWrapper>
-          <QuizTimer 
-            totalSeconds={3600} 
+          <QuizTimer
+            totalSeconds={3600}
             remainingSeconds={30} // 30 seconds left
             onTimeout={vi.fn()}
             criticalThreshold={60}
@@ -343,14 +322,10 @@ describe('Quiz Components', () => {
   describe('QuizProgress Component', () => {
     it('should show current question number', async () => {
       const { QuizProgress } = await import('../../components/features/quiz/QuizProgress');
-      
+
       render(
         <TestWrapper>
-          <QuizProgress 
-            currentQuestion={5}
-            totalQuestions={10}
-            answeredQuestions={4}
-          />
+          <QuizProgress currentQuestion={5} totalQuestions={10} answeredQuestions={4} />
         </TestWrapper>
       );
 
@@ -359,14 +334,10 @@ describe('Quiz Components', () => {
 
     it('should show progress percentage', async () => {
       const { QuizProgress } = await import('../../components/features/quiz/QuizProgress');
-      
+
       render(
         <TestWrapper>
-          <QuizProgress 
-            currentQuestion={5}
-            totalQuestions={10}
-            answeredQuestions={5}
-          />
+          <QuizProgress currentQuestion={5} totalQuestions={10} answeredQuestions={5} />
         </TestWrapper>
       );
 
@@ -375,14 +346,10 @@ describe('Quiz Components', () => {
 
     it('should indicate answered questions', async () => {
       const { QuizProgress } = await import('../../components/features/quiz/QuizProgress');
-      
+
       render(
         <TestWrapper>
-          <QuizProgress 
-            currentQuestion={5}
-            totalQuestions={10}
-            answeredQuestions={4}
-          />
+          <QuizProgress currentQuestion={5} totalQuestions={10} answeredQuestions={4} />
         </TestWrapper>
       );
 
@@ -396,10 +363,10 @@ describe('Quiz Components', () => {
     it('should navigate to previous question', async () => {
       const onPrevious = vi.fn();
       const { QuizNavigation } = await import('../../components/features/quiz/QuizNavigation');
-      
+
       render(
         <TestWrapper>
-          <QuizNavigation 
+          <QuizNavigation
             currentQuestion={5}
             totalQuestions={10}
             onPrevious={onPrevious}
@@ -418,10 +385,10 @@ describe('Quiz Components', () => {
 
     it('should disable previous button on first question', async () => {
       const { QuizNavigation } = await import('../../components/features/quiz/QuizNavigation');
-      
+
       render(
         <TestWrapper>
-          <QuizNavigation 
+          <QuizNavigation
             currentQuestion={1}
             totalQuestions={10}
             onPrevious={vi.fn()}
@@ -438,10 +405,10 @@ describe('Quiz Components', () => {
 
     it('should show submit button on last question', async () => {
       const { QuizNavigation } = await import('../../components/features/quiz/QuizNavigation');
-      
+
       render(
         <TestWrapper>
-          <QuizNavigation 
+          <QuizNavigation
             currentQuestion={10}
             totalQuestions={10}
             onPrevious={vi.fn()}
@@ -458,10 +425,10 @@ describe('Quiz Components', () => {
     it('should confirm before submit if not all questions answered', async () => {
       const onSubmit = vi.fn();
       const { QuizNavigation } = await import('../../components/features/quiz/QuizNavigation');
-      
+
       render(
         <TestWrapper>
-          <QuizNavigation 
+          <QuizNavigation
             currentQuestion={10}
             totalQuestions={10}
             onPrevious={vi.fn()}
@@ -484,7 +451,7 @@ describe('Quiz Components', () => {
   describe('Quiz Submission', () => {
     it('should submit all answers on completion', async () => {
       const { quizService } = await import('../../services/quiz.service');
-      
+
       (quizService.submitAllAnswers as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         score: 80,
         correctAnswers: 8,
@@ -502,19 +469,19 @@ describe('Quiz Components', () => {
 
     it('should handle submission error', async () => {
       const { quizService } = await import('../../services/quiz.service');
-      
+
       (quizService.submitAllAnswers as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
         new Error('Network error')
       );
 
-      await expect(
-        quizService.submitAllAnswers('session-123', [])
-      ).rejects.toThrow('Network error');
+      await expect(quizService.submitAllAnswers('session-123', [])).rejects.toThrow(
+        'Network error'
+      );
     });
 
     it('should handle partial answers submission', async () => {
       const { quizService } = await import('../../services/quiz.service');
-      
+
       (quizService.submitAllAnswers as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         score: 30,
         correctAnswers: 3,
@@ -537,7 +504,7 @@ describe('Quiz Components', () => {
   describe('Quiz Abandonment', () => {
     it('should confirm before abandoning quiz', async () => {
       const onAbandon = vi.fn();
-      
+
       // Mock window.confirm
       vi.spyOn(window, 'confirm').mockReturnValueOnce(true);
 
@@ -548,7 +515,7 @@ describe('Quiz Components', () => {
 
     it('should save progress before abandoning', async () => {
       const { quizService } = await import('../../services/quiz.service');
-      
+
       (quizService.abandonSession as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         status: 'abandoned',
       });
@@ -592,7 +559,7 @@ describe('Quiz Results', () => {
 
     it('should display score', async () => {
       const { QuizResults } = await import('../../components/features/quiz/QuizResults');
-      
+
       render(
         <TestWrapper>
           <QuizResults results={mockResults} />
@@ -604,7 +571,7 @@ describe('Quiz Results', () => {
 
     it('should display correct/total answers', async () => {
       const { QuizResults } = await import('../../components/features/quiz/QuizResults');
-      
+
       render(
         <TestWrapper>
           <QuizResults results={mockResults} />
@@ -616,7 +583,7 @@ describe('Quiz Results', () => {
 
     it('should show confetti for high scores', async () => {
       const { QuizResults } = await import('../../components/features/quiz/QuizResults');
-      
+
       render(
         <TestWrapper>
           <QuizResults results={{ ...mockResults, score: 90 }} />
@@ -629,7 +596,7 @@ describe('Quiz Results', () => {
 
     it('should not show confetti for low scores', async () => {
       const { QuizResults } = await import('../../components/features/quiz/QuizResults');
-      
+
       render(
         <TestWrapper>
           <QuizResults results={{ ...mockResults, score: 50 }} />
@@ -641,7 +608,7 @@ describe('Quiz Results', () => {
 
     it('should allow reviewing answers', async () => {
       const { QuizResults } = await import('../../components/features/quiz/QuizResults');
-      
+
       render(
         <TestWrapper>
           <QuizResults results={mockResults} />
@@ -667,7 +634,7 @@ describe('Quiz Results', () => {
       };
 
       const { QuizResults } = await import('../../components/features/quiz/QuizResults');
-      
+
       render(
         <TestWrapper>
           <QuizResults results={resultsWithExplanations} />

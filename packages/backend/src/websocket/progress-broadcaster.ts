@@ -2,8 +2,8 @@
  * Progress Broadcaster
  * Utility for broadcasting PDF processing progress via WebSocket
  */
-import { JobProgress } from '../queues/pdf-queue';
 import { broadcastProgress, broadcastCompletion } from './socket-server';
+import { JobProgress } from '../queues/pdf-queue';
 import { logger } from '../utils/logger';
 
 /**
@@ -30,11 +30,7 @@ class ProgressBroadcaster {
   /**
    * Broadcast successful completion
    */
-  broadcastSuccess(
-    userId: string,
-    pdfId: string,
-    questionCount: number
-  ): void {
+  broadcastSuccess(userId: string, pdfId: string, questionCount: number): void {
     try {
       broadcastCompletion(userId, pdfId, {
         success: true,
@@ -52,11 +48,7 @@ class ProgressBroadcaster {
   /**
    * Broadcast failure
    */
-  broadcastFailure(
-    userId: string,
-    pdfId: string,
-    errorMessage: string
-  ): void {
+  broadcastFailure(userId: string, pdfId: string, errorMessage: string): void {
     try {
       broadcastCompletion(userId, pdfId, {
         success: false,

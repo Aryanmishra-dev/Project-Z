@@ -1,6 +1,6 @@
 /**
  * Alerting Service
- * 
+ *
  * Monitors application health and sends alerts when thresholds are exceeded.
  * Supports multiple notification channels: console, webhook, email.
  */
@@ -266,7 +266,9 @@ class AlertingService {
     if (relevantHistory.length === 0) return false;
 
     // Check if condition has been true for the entire duration
-    return relevantHistory.every((h) => this.checkCondition(h.value, rule.condition, rule.threshold));
+    return relevantHistory.every((h) =>
+      this.checkCondition(h.value, rule.condition, rule.threshold)
+    );
   }
 
   /**
@@ -332,7 +334,7 @@ class AlertingService {
    */
   private async resolveAlert(alert: Alert): Promise<void> {
     alert.resolvedAt = new Date().toISOString();
-    
+
     // Store resolution in Redis
     await this.persistAlert(alert);
 
@@ -367,9 +369,7 @@ class AlertingService {
       warning: '⚠️',
       critical: '🚨',
     };
-    console.log(
-      `${severityEmoji[alert.severity]} [ALERT] ${alert.ruleName}: ${alert.message}`
-    );
+    console.log(`${severityEmoji[alert.severity]} [ALERT] ${alert.ruleName}: ${alert.message}`);
 
     // Webhook notification
     if (this.config.webhookUrl) {

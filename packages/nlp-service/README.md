@@ -97,18 +97,18 @@ docker run -p 8000:8000 \
 
 ## Configuration
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `SERVICE_HOST` | `0.0.0.0` | Service host |
-| `SERVICE_PORT` | `8000` | Service port |
-| `DEBUG` | `false` | Debug mode |
-| `LOG_LEVEL` | `INFO` | Logging level |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama API URL |
-| `OLLAMA_MODEL` | `mistral:7b-instruct-q4_K_M` | LLM model |
-| `REDIS_HOST` | `localhost` | Redis host |
-| `REDIS_PORT` | `6379` | Redis port |
-| `CHUNK_SIZE_WORDS` | `800` | Target chunk size |
-| `CHUNK_OVERLAP_WORDS` | `200` | Chunk overlap |
+| Variable              | Default                      | Description       |
+| --------------------- | ---------------------------- | ----------------- |
+| `SERVICE_HOST`        | `0.0.0.0`                    | Service host      |
+| `SERVICE_PORT`        | `8000`                       | Service port      |
+| `DEBUG`               | `false`                      | Debug mode        |
+| `LOG_LEVEL`           | `INFO`                       | Logging level     |
+| `OLLAMA_BASE_URL`     | `http://localhost:11434`     | Ollama API URL    |
+| `OLLAMA_MODEL`        | `mistral:7b-instruct-q4_K_M` | LLM model         |
+| `REDIS_HOST`          | `localhost`                  | Redis host        |
+| `REDIS_PORT`          | `6379`                       | Redis port        |
+| `CHUNK_SIZE_WORDS`    | `800`                        | Target chunk size |
+| `CHUNK_OVERLAP_WORDS` | `200`                        | Chunk overlap     |
 
 ## Testing
 

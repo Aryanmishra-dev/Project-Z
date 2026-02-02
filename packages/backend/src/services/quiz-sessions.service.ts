@@ -3,14 +3,15 @@
  * Business logic for quiz session management
  */
 import { eq, and, desc, count, sql } from 'drizzle-orm';
+
 import { db } from '../db';
+import { questionsService } from './questions.service';
+import { pdfs } from '../db/schema/pdfs';
+import { questions, type Question } from '../db/schema/questions';
 import { quizSessions, type QuizSession, type NewQuizSession } from '../db/schema/quiz-sessions';
 import { userAnswers, type UserAnswer, type NewUserAnswer } from '../db/schema/user-answers';
-import { questions, type Question } from '../db/schema/questions';
-import { pdfs } from '../db/schema/pdfs';
 import { NotFoundError, AppError, ValidationError } from '../utils/errors';
 import { logger } from '../utils/logger';
-import { questionsService } from './questions.service';
 
 /**
  * Session creation options
@@ -144,10 +145,7 @@ class QuizSessionsService {
    * Get a session by ID
    */
   async getById(id: string): Promise<QuizSession | null> {
-    const [session] = await db
-      .select()
-      .from(quizSessions)
-      .where(eq(quizSessions.id, id));
+    const [session] = await db.select().from(quizSessions).where(eq(quizSessions.id, id));
 
     return session || null;
   }
@@ -299,9 +297,10 @@ class QuizSessionsService {
       .where(eq(userAnswers.quizSessionId, sessionId));
 
     // Calculate score
-    const scorePercentage = session.totalQuestions > 0
-      ? ((session.correctAnswers / session.totalQuestions) * 100).toFixed(2)
-      : '0.00';
+    const scorePercentage =
+      session.totalQuestions > 0
+        ? ((session.correctAnswers / session.totalQuestions) * 100).toFixed(2)
+        : '0.00';
 
     // Update session
     await db
@@ -430,10 +429,7 @@ class QuizSessionsService {
         avgScore: sql<number>`avg(${quizSessions.scorePercentage}::numeric)`,
       })
       .from(quizSessions)
-      .where(and(
-        eq(quizSessions.userId, userId),
-        eq(quizSessions.status, 'completed')
-      ));
+      .where(and(eq(quizSessions.userId, userId), eq(quizSessions.status, 'completed')));
 
     return {
       totalQuizzes: Number(stats?.totalQuizzes || 0),

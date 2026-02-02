@@ -1,10 +1,11 @@
 /**
  * Monitoring Middleware
- * 
+ *
  * Tracks request metrics for monitoring and alerting.
  */
 
 import { Request, Response, NextFunction } from 'express';
+
 import { trackRequest } from '../routes/health.routes';
 import { alertingService } from '../services/alerting.service';
 
@@ -31,7 +32,7 @@ const metricsStore = {
   errorCount: 0,
   responseTimes: [] as number[],
   errorRate: 0,
-  
+
   // Rolling window calculation
   recentRequests: [] as { timestamp: number; success: boolean; responseTime: number }[],
 };
@@ -39,8 +40,8 @@ const metricsStore = {
 // Calculate metrics over last N minutes
 const calculateRollingMetrics = (windowMinutes = 5) => {
   const cutoff = Date.now() - windowMinutes * 60 * 1000;
-  const recentRequests = metricsStore.recentRequests.filter(r => r.timestamp > cutoff);
-  
+  const recentRequests = metricsStore.recentRequests.filter((r) => r.timestamp > cutoff);
+
   if (recentRequests.length === 0) {
     return {
       errorRate: 0,
@@ -51,16 +52,16 @@ const calculateRollingMetrics = (windowMinutes = 5) => {
       requestCount: 0,
     };
   }
-  
-  const errors = recentRequests.filter(r => !r.success).length;
-  const responseTimes = recentRequests.map(r => r.responseTime).sort((a, b) => a - b);
-  
+
+  const errors = recentRequests.filter((r) => !r.success).length;
+  const responseTimes = recentRequests.map((r) => r.responseTime).sort((a, b) => a - b);
+
   const percentile = (arr: number[], p: number) => {
     if (arr.length === 0) return 0;
     const index = Math.ceil((p / 100) * arr.length) - 1;
     return arr[Math.max(0, index)];
   };
-  
+
   return {
     errorRate: (errors / recentRequests.length) * 100,
     avgResponseTime: responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length,
@@ -74,7 +75,7 @@ const calculateRollingMetrics = (windowMinutes = 5) => {
 // Cleanup old metrics periodically
 setInterval(() => {
   const cutoff = Date.now() - 10 * 60 * 1000; // Keep 10 minutes of data
-  metricsStore.recentRequests = metricsStore.recentRequests.filter(r => r.timestamp > cutoff);
+  metricsStore.recentRequests = metricsStore.recentRequests.filter((r) => r.timestamp > cutoff);
 }, 60 * 1000);
 
 // Update alerting service with current metrics
@@ -82,7 +83,7 @@ setInterval(() => {
   const metrics = calculateRollingMetrics();
   const memUsage = process.memoryUsage();
   const memPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
-  
+
   alertingService.recordMetric('error_rate', metrics.errorRate);
   alertingService.recordMetric('response_time_p95', metrics.p95ResponseTime);
   alertingService.recordMetric('response_time_p99', metrics.p99ResponseTime);
@@ -95,51 +96,56 @@ setInterval(() => {
  */
 export const monitoringMiddleware = (req: Request, res: Response, next: NextFunction) => {
   // Skip health check endpoints
-  if (req.path === '/health' || req.path === '/live' || req.path === '/ready' || req.path === '/metrics') {
+  if (
+    req.path === '/health' ||
+    req.path === '/live' ||
+    req.path === '/ready' ||
+    req.path === '/metrics'
+  ) {
     return next();
   }
-  
+
   const startTime = process.hrtime();
-  
+
   req.metrics = {
     startTime: Date.now(),
     method: req.method,
     path: req.path,
   };
-  
+
   // Intercept response finish
   res.on('finish', () => {
     const [seconds, nanoseconds] = process.hrtime(startTime);
     const responseTime = Math.round(seconds * 1000 + nanoseconds / 1000000);
-    
+
     metricsStore.requestCount++;
-    
+
     const success = res.statusCode < 400;
     if (!success) {
       metricsStore.errorCount++;
     }
-    
+
     // Store in rolling window
     metricsStore.recentRequests.push({
       timestamp: Date.now(),
       success,
       responseTime,
     });
-    
+
     // Track request for health endpoint
     trackRequest(res.statusCode, responseTime);
-    
+
     // Log slow requests
     if (responseTime > 1000) {
       console.warn(`[Monitoring] Slow request: ${req.method} ${req.path} - ${responseTime}ms`);
     }
-    
+
     // Log errors
     if (res.statusCode >= 500) {
       console.error(`[Monitoring] Server error: ${req.method} ${req.path} - ${res.statusCode}`);
     }
   });
-  
+
   next();
 };
 
@@ -149,7 +155,7 @@ export const monitoringMiddleware = (req: Request, res: Response, next: NextFunc
 export const getMetricsSummary = () => {
   const rolling = calculateRollingMetrics();
   const memUsage = process.memoryUsage();
-  
+
   return {
     uptime: process.uptime(),
     requests: {
@@ -178,14 +184,12 @@ export const getMetricsSummary = () => {
  */
 export const requestLoggingMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const timestamp = new Date().toISOString();
-  
+
   res.on('finish', () => {
     const duration = req.metrics ? Date.now() - req.metrics.startTime : 0;
-    console.log(
-      `[${timestamp}] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`
-    );
+    console.log(`[${timestamp}] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
   });
-  
+
   next();
 };
 

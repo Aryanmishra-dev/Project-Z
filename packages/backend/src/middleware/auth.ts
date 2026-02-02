@@ -3,6 +3,7 @@
  * Verifies JWT access tokens and attaches user info to request
  */
 import { Request, Response, NextFunction } from 'express';
+
 import { verifyAccessToken, type AccessTokenPayload } from '../config/jwt';
 import { AuthenticationError, AuthorizationError } from '../utils/errors';
 import { logger } from '../utils/logger';
@@ -21,12 +22,12 @@ export interface AuthenticatedRequest extends Request {
  */
 function extractBearerToken(authHeader: string | undefined): string | null {
   if (!authHeader) return null;
-  
+
   const parts = authHeader.split(' ');
   if (parts.length !== 2 || parts[0]?.toLowerCase() !== 'bearer') {
     return null;
   }
-  
+
   return parts[1] ?? null;
 }
 
@@ -34,27 +35,23 @@ function extractBearerToken(authHeader: string | undefined): string | null {
  * Middleware to verify JWT access token
  * Attaches user payload to request if valid
  */
-export function authenticate(
-  req: AuthenticatedRequest,
-  _res: Response,
-  next: NextFunction
-): void {
+export function authenticate(req: AuthenticatedRequest, _res: Response, next: NextFunction): void {
   try {
     const token = extractBearerToken(req.headers.authorization);
-    
+
     if (!token) {
       throw new AuthenticationError('No authentication token provided');
     }
 
     const payload = verifyAccessToken(token);
-    
+
     if (!payload) {
       throw new AuthenticationError('Invalid or expired token');
     }
 
     // Attach user info to request
     req.user = payload;
-    
+
     logger.debug('Request authenticated', {
       userId: payload.sub,
       email: payload.email,
@@ -99,19 +96,15 @@ export function authorize(...allowedRoles: Array<'user' | 'admin'>) {
  * Optional authentication middleware
  * Attaches user if token present, but doesn't require it
  */
-export function optionalAuth(
-  req: AuthenticatedRequest,
-  _res: Response,
-  next: NextFunction
-): void {
+export function optionalAuth(req: AuthenticatedRequest, _res: Response, next: NextFunction): void {
   const token = extractBearerToken(req.headers.authorization);
-  
+
   if (token) {
     const payload = verifyAccessToken(token);
     if (payload) {
       req.user = payload;
     }
   }
-  
+
   next();
 }

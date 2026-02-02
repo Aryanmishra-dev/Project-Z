@@ -24,6 +24,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -68,6 +69,7 @@ Content-Type: application/json
 ### Authentication
 
 #### Register User
+
 ```http
 POST /auth/register
 ```
@@ -80,6 +82,7 @@ POST /auth/register
 | username | string | Yes | 3-30 characters |
 
 **Response:** `201 Created`
+
 ```json
 {
   "success": true,
@@ -95,6 +98,7 @@ POST /auth/register
 ```
 
 #### Login
+
 ```http
 POST /auth/login
 ```
@@ -106,18 +110,21 @@ POST /auth/login
 | password | string | Yes |
 
 #### Logout
+
 ```http
 POST /auth/logout
 Authorization: Bearer {token}
 ```
 
 #### Logout All Sessions
+
 ```http
 POST /auth/logout-all
 Authorization: Bearer {token}
 ```
 
 #### Change Password
+
 ```http
 POST /auth/change-password
 Authorization: Bearer {token}
@@ -134,12 +141,14 @@ Authorization: Bearer {token}
 ### Users
 
 #### Get Current User
+
 ```http
 GET /users/me
 Authorization: Bearer {token}
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -156,6 +165,7 @@ Authorization: Bearer {token}
 ```
 
 #### Update Profile
+
 ```http
 PATCH /users/me
 Authorization: Bearer {token}
@@ -168,6 +178,7 @@ Authorization: Bearer {token}
 | email | string | No |
 
 #### Delete Account
+
 ```http
 DELETE /users/me
 Authorization: Bearer {token}
@@ -183,6 +194,7 @@ Authorization: Bearer {token}
 ### PDFs
 
 #### Upload PDF
+
 ```http
 POST /pdfs
 Authorization: Bearer {token}
@@ -196,6 +208,7 @@ Content-Type: multipart/form-data
 | title | string | No | Custom title |
 
 **Response:** `201 Created`
+
 ```json
 {
   "success": true,
@@ -214,6 +227,7 @@ Content-Type: multipart/form-data
 ```
 
 #### List PDFs
+
 ```http
 GET /pdfs
 Authorization: Bearer {token}
@@ -229,6 +243,7 @@ Authorization: Bearer {token}
 | order | string | desc | Sort order (asc/desc) |
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -245,12 +260,14 @@ Authorization: Bearer {token}
 ```
 
 #### Get PDF Details
+
 ```http
 GET /pdfs/{id}
 Authorization: Bearer {token}
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -270,6 +287,7 @@ Authorization: Bearer {token}
 ```
 
 #### Delete PDF
+
 ```http
 DELETE /pdfs/{id}
 Authorization: Bearer {token}
@@ -278,6 +296,7 @@ Authorization: Bearer {token}
 **Response:** `204 No Content`
 
 #### Regenerate Questions
+
 ```http
 POST /pdfs/{id}/regenerate
 Authorization: Bearer {token}
@@ -294,6 +313,7 @@ Authorization: Bearer {token}
 ### Quiz Sessions
 
 #### Create Quiz Session
+
 ```http
 POST /quiz-sessions
 Authorization: Bearer {token}
@@ -308,6 +328,7 @@ Authorization: Bearer {token}
 | timeLimit | number | No | null |
 
 **Response:** `201 Created`
+
 ```json
 {
   "success": true,
@@ -340,12 +361,14 @@ Authorization: Bearer {token}
 ```
 
 #### Get Quiz Session
+
 ```http
 GET /quiz-sessions/{id}
 Authorization: Bearer {token}
 ```
 
 #### List Quiz Sessions
+
 ```http
 GET /quiz-sessions
 Authorization: Bearer {token}
@@ -360,6 +383,7 @@ Authorization: Bearer {token}
 | pdfId | string | - | Filter by PDF |
 
 #### Submit Answer
+
 ```http
 POST /quiz-sessions/{id}/answer
 Authorization: Bearer {token}
@@ -373,12 +397,14 @@ Authorization: Bearer {token}
 | timeSpentSeconds | number | No |
 
 #### Submit All Answers
+
 ```http
 POST /quiz-sessions/{id}/submit
 Authorization: Bearer {token}
 ```
 
 **Request Body:**
+
 ```json
 {
   "answers": [
@@ -392,6 +418,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -420,6 +447,7 @@ Authorization: Bearer {token}
 ```
 
 #### Abandon Quiz Session
+
 ```http
 POST /quiz-sessions/{id}/abandon
 Authorization: Bearer {token}
@@ -430,6 +458,7 @@ Authorization: Bearer {token}
 ### Analytics
 
 #### Get Performance Trends
+
 ```http
 GET /analytics/trends
 Authorization: Bearer {token}
@@ -442,6 +471,7 @@ Authorization: Bearer {token}
 | groupBy | string | day | day, week, month |
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -464,6 +494,7 @@ Authorization: Bearer {token}
 ```
 
 #### Get Weak Areas
+
 ```http
 GET /analytics/weak-areas
 Authorization: Bearer {token}
@@ -475,6 +506,7 @@ Authorization: Bearer {token}
 | limit | number | 5 |
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -492,12 +524,14 @@ Authorization: Bearer {token}
 ```
 
 #### Get Study Patterns
+
 ```http
 GET /analytics/patterns
 Authorization: Bearer {token}
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -518,12 +552,14 @@ Authorization: Bearer {token}
 ```
 
 #### Get Streaks
+
 ```http
 GET /analytics/streaks
 Authorization: Bearer {token}
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -543,11 +579,13 @@ Authorization: Bearer {token}
 ### Health & Status
 
 #### Health Check
+
 ```http
 GET /health
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "status": "healthy",
@@ -584,15 +622,15 @@ All errors follow a consistent format:
 
 ### Error Codes
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| VALIDATION_ERROR | 400 | Invalid request data |
-| UNAUTHORIZED | 401 | Missing or invalid authentication |
-| FORBIDDEN | 403 | Insufficient permissions |
-| NOT_FOUND | 404 | Resource not found |
-| CONFLICT | 409 | Resource already exists |
-| RATE_LIMITED | 429 | Too many requests |
-| INTERNAL_ERROR | 500 | Server error |
+| Code             | HTTP Status | Description                       |
+| ---------------- | ----------- | --------------------------------- |
+| VALIDATION_ERROR | 400         | Invalid request data              |
+| UNAUTHORIZED     | 401         | Missing or invalid authentication |
+| FORBIDDEN        | 403         | Insufficient permissions          |
+| NOT_FOUND        | 404         | Resource not found                |
+| CONFLICT         | 409         | Resource already exists           |
+| RATE_LIMITED     | 429         | Too many requests                 |
+| INTERNAL_ERROR   | 500         | Server error                      |
 
 ---
 
@@ -600,14 +638,15 @@ All errors follow a consistent format:
 
 API requests are rate limited per user:
 
-| Endpoint Type | Limit | Window |
-|---------------|-------|--------|
-| Authentication | 5 requests | 15 minutes |
-| General API | 100 requests | 1 minute |
-| PDF Upload | 10 requests | 1 hour |
-| Quiz Submission | 30 requests | 1 hour |
+| Endpoint Type   | Limit        | Window     |
+| --------------- | ------------ | ---------- |
+| Authentication  | 5 requests   | 15 minutes |
+| General API     | 100 requests | 1 minute   |
+| PDF Upload      | 10 requests  | 1 hour     |
+| Quiz Submission | 30 requests  | 1 hour     |
 
 When rate limited, responses include:
+
 ```http
 HTTP/1.1 429 Too Many Requests
 X-RateLimit-Limit: 100
@@ -638,6 +677,7 @@ Configure webhooks for real-time notifications:
 ## Changelog
 
 ### v1.0.0 (January 2025)
+
 - Initial API release
 - Core authentication endpoints
 - PDF management
@@ -646,4 +686,4 @@ Configure webhooks for real-time notifications:
 
 ---
 
-*For support, contact api-support@pdfquizgen.com*
+_For support, contact api-support@pdfquizgen.com_

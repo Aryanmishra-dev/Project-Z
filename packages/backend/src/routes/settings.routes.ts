@@ -4,13 +4,10 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import {
-  authenticate,
-  asyncHandler,
-  validate,
-} from '../middleware';
-import { userSettingsService } from '../services/user-settings.service';
+
+import { authenticate, asyncHandler, validate } from '../middleware';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { userSettingsService } from '../services/user-settings.service';
 
 const router = Router();
 
@@ -21,12 +18,14 @@ router.use(authenticate);
  * Profile update validation schema
  */
 const updateProfileSchema = z.object({
-  body: z.object({
-    fullName: z.string().min(2).max(100).optional(),
-    email: z.string().email().optional(),
-  }).refine(data => data.fullName || data.email, {
-    message: 'At least one field is required',
-  }),
+  body: z
+    .object({
+      fullName: z.string().min(2).max(100).optional(),
+      email: z.string().email().optional(),
+    })
+    .refine((data) => data.fullName || data.email, {
+      message: 'At least one field is required',
+    }),
 });
 
 /**
@@ -123,7 +122,7 @@ router.patch(
   validate(updateProfileSchema),
   asyncHandler(async (req: AuthenticatedRequest, res): Promise<void> => {
     const userId = req.user!.sub;
-    
+
     try {
       const profile = await userSettingsService.updateProfile(userId, req.body);
 
@@ -321,8 +320,11 @@ router.get(
     const data = await userSettingsService.exportData(userId);
 
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename="account-data-${new Date().toISOString().split('T')[0]}.json"`);
-    
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="account-data-${new Date().toISOString().split('T')[0]}.json"`
+    );
+
     res.json(data);
   })
 );

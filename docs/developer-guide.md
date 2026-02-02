@@ -178,6 +178,7 @@ packages/frontend/
 ## Tech Stack
 
 ### Backend
+
 - **Runtime**: Node.js 20+
 - **Framework**: Express.js
 - **Language**: TypeScript
@@ -188,6 +189,7 @@ packages/frontend/
 - **Authentication**: JWT (RS256)
 
 ### Frontend
+
 - **Framework**: React 18
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS
@@ -196,12 +198,14 @@ packages/frontend/
 - **Components**: Radix UI primitives
 
 ### NLP Service
+
 - **Framework**: FastAPI
 - **Language**: Python 3.11+
 - **LLM**: OpenAI GPT-4
 - **PDF Processing**: PyMuPDF
 
 ### DevOps
+
 - **Containerization**: Docker
 - **CI/CD**: GitHub Actions
 - **Testing**: Vitest, pytest, Playwright
@@ -236,7 +240,7 @@ const QuizStatus = {
   COMPLETED: 'completed',
 } as const;
 
-type QuizStatusType = typeof QuizStatus[keyof typeof QuizStatus];
+type QuizStatusType = (typeof QuizStatus)[keyof typeof QuizStatus];
 ```
 
 ### React Guidelines
@@ -258,7 +262,7 @@ const useUser = (userId: string) => {
     queryKey: ['user', userId],
     queryFn: () => userService.getById(userId),
   });
-  
+
   return query;
 };
 
@@ -287,11 +291,11 @@ async def generate_questions(
     config: QuestionRequest
 ) -> List[Question]:
     """Generate quiz questions from content.
-    
+
     Args:
         content: The text content to generate questions from.
         config: Question generation configuration.
-        
+
     Returns:
         A list of generated Question objects.
     """
@@ -349,23 +353,23 @@ import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
-  
+
   beforeEach(() => {
     authService = new AuthService();
     vi.clearAllMocks();
   });
-  
+
   describe('login', () => {
     it('should return tokens for valid credentials', async () => {
       const result = await authService.login({
         email: 'test@example.com',
         password: 'password123',
       });
-      
+
       expect(result.tokens.accessToken).toBeDefined();
       expect(result.tokens.refreshToken).toBeDefined();
     });
-    
+
     it('should throw for invalid password', async () => {
       await expect(
         authService.login({
@@ -389,16 +393,16 @@ describe('QuizQuestion', () => {
     text: 'What is 2 + 2?',
     options: { A: '3', B: '4', C: '5', D: '6' },
   };
-  
+
   it('renders question text', () => {
     render(<QuizQuestion question={mockQuestion} />);
     expect(screen.getByText('What is 2 + 2?')).toBeInTheDocument();
   });
-  
+
   it('calls onAnswer when option selected', () => {
     const onAnswer = vi.fn();
     render(<QuizQuestion question={mockQuestion} onAnswer={onAnswer} />);
-    
+
     fireEvent.click(screen.getByText('4'));
     expect(onAnswer).toHaveBeenCalledWith('1', 'B');
   });
@@ -435,6 +439,7 @@ k6 run scripts/load-test/stress-test.js
 ### Adding a New Endpoint
 
 1. **Define the route** in `routes/`:
+
 ```typescript
 // routes/feature.routes.ts
 import { Router } from 'express';
@@ -451,11 +456,12 @@ export { router as featureRoutes };
 ```
 
 2. **Create the controller** in `controllers/`:
+
 ```typescript
 // controllers/feature.controller.ts
 export class FeatureController {
   private service = new FeatureService();
-  
+
   list = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this.service.list(req.query);
@@ -468,11 +474,12 @@ export class FeatureController {
 ```
 
 3. **Implement the service** in `services/`:
+
 ```typescript
 // services/feature.service.ts
 export class FeatureService {
   private repository = new FeatureRepository();
-  
+
   async list(options: ListOptions) {
     return this.repository.findMany(options);
   }
@@ -480,6 +487,7 @@ export class FeatureService {
 ```
 
 4. **Add validation** using Zod:
+
 ```typescript
 // validators/feature.validator.ts
 import { z } from 'zod';
@@ -556,11 +564,11 @@ export class CacheService {
     const value = await redis.get(key);
     return value ? JSON.parse(value) : null;
   }
-  
+
   async set(key: string, value: unknown, ttlSeconds = 3600): Promise<void> {
     await redis.setex(key, ttlSeconds, JSON.stringify(value));
   }
-  
+
   async invalidate(pattern: string): Promise<void> {
     const keys = await redis.keys(pattern);
     if (keys.length) {
@@ -592,7 +600,7 @@ from openai import OpenAI
 class QuestionGenerator:
     def __init__(self):
         self.client = OpenAI()
-    
+
     async def generate(
         self,
         content: str,
@@ -600,13 +608,13 @@ class QuestionGenerator:
         difficulty: str = "medium"
     ) -> list[Question]:
         prompt = self._build_prompt(content, count, difficulty)
-        
+
         response = await self.client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
         )
-        
+
         return self._parse_response(response)
 ```
 
@@ -648,4 +656,4 @@ class QuestionGenerator:
 
 ---
 
-*Happy coding! 🚀*
+_Happy coding! 🚀_

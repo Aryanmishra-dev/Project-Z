@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { cn } from '@/utils/cn';
 
 interface ConfettiPiece {
@@ -88,10 +89,7 @@ const Confetti: React.FC<ConfettiProps> = ({
 
   return (
     <div
-      className={cn(
-        'fixed inset-0 pointer-events-none overflow-hidden z-50',
-        className
-      )}
+      className={cn('fixed inset-0 pointer-events-none overflow-hidden z-50', className)}
       aria-hidden="true"
     >
       {pieces.map((piece) => (
@@ -167,10 +165,7 @@ const ConfettiStreamers: React.FC<Omit<ConfettiProps, 'count'> & { count?: numbe
 
   return (
     <div
-      className={cn(
-        'fixed inset-0 pointer-events-none overflow-hidden z-50',
-        className
-      )}
+      className={cn('fixed inset-0 pointer-events-none overflow-hidden z-50', className)}
       aria-hidden="true"
     >
       {streamers.map((streamer) => (
@@ -201,9 +196,7 @@ interface FireworkBurst {
   particles: { angle: number; distance: number; color: string }[];
 }
 
-const ConfettiFireworks: React.FC<
-  Omit<ConfettiProps, 'count'> & { bursts?: number }
-> = ({
+const ConfettiFireworks: React.FC<Omit<ConfettiProps, 'count'> & { bursts?: number }> = ({
   active,
   bursts = 5,
   duration = 2000,
@@ -247,10 +240,7 @@ const ConfettiFireworks: React.FC<
 
   return (
     <div
-      className={cn(
-        'fixed inset-0 pointer-events-none overflow-hidden z-50',
-        className
-      )}
+      className={cn('fixed inset-0 pointer-events-none overflow-hidden z-50', className)}
       aria-hidden="true"
     >
       {fireworks.map((firework, fIndex) => (

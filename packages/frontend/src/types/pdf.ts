@@ -53,9 +53,6 @@ export interface PDFListResponse {
 
 export interface PDFUploadResponse {
   success: boolean;
-  data: {
-    pdf: PDF;
-    jobId: string;
-  };
+  data: PDF;
   message: string;
 }

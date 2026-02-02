@@ -1,11 +1,6 @@
+import { LayoutDashboard, FileText, BarChart3, Settings, HelpCircle } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  FileText,
-  BarChart3,
-  Settings,
-  HelpCircle,
-} from 'lucide-react';
+
 import { cn } from '@/utils/cn';
 import { ROUTES } from '@/utils/constants';
 

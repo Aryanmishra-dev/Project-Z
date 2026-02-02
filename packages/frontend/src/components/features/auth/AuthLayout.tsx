@@ -13,17 +13,18 @@ export function AuthLayout() {
             <span className="text-2xl font-bold text-white">QuizGenius</span>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           <h1 className="text-4xl font-bold text-white leading-tight">
-            Transform your PDFs into<br />
+            Transform your PDFs into
+            <br />
             interactive quizzes
           </h1>
           <p className="text-lg text-primary-100">
-            Upload any PDF document and let our AI generate smart questions
-            to help you learn faster and retain more.
+            Upload any PDF document and let our AI generate smart questions to help you learn faster
+            and retain more.
           </p>
-          
+
           <div className="flex items-center gap-4 pt-4">
             <div className="flex -space-x-2">
               {[1, 2, 3, 4].map((i) => (
@@ -38,23 +39,38 @@ export function AuthLayout() {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-8 text-primary-200 text-sm">
           <div className="flex items-center gap-2">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
             AI-Powered
           </div>
           <div className="flex items-center gap-2">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
             Instant Results
           </div>
           <div className="flex items-center gap-2">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
             Track Progress
           </div>

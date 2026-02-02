@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Settings, Play } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import {
   Dialog,
   DialogContent,
@@ -17,10 +18,16 @@ import {
   SelectValue,
   Spinner,
 } from '@/components/ui';
-import { quizService, pdfService } from '@/services';
 import { getErrorMessage } from '@/lib/api';
-import { MIN_QUESTIONS, MAX_QUESTIONS, DEFAULT_QUESTION_COUNT, ROUTES, DIFFICULTY_CONFIG } from '@/utils/constants';
+import { quizService, pdfService } from '@/services';
 import type { Difficulty } from '@/types';
+import {
+  MIN_QUESTIONS,
+  MAX_QUESTIONS,
+  DEFAULT_QUESTION_COUNT,
+  ROUTES,
+  DIFFICULTY_CONFIG,
+} from '@/utils/constants';
 
 interface QuizConfigProps {
   open: boolean;
@@ -89,9 +96,7 @@ export function QuizConfig({ open, onOpenChange, preselectedPdfId }: QuizConfigP
             <Settings className="h-5 w-5" />
             Quiz Settings
           </DialogTitle>
-          <DialogDescription>
-            Configure your quiz settings before starting
-          </DialogDescription>
+          <DialogDescription>Configure your quiz settings before starting</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -147,9 +152,7 @@ export function QuizConfig({ open, onOpenChange, preselectedPdfId }: QuizConfigP
 
           {/* Question Count */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Number of Questions
-            </label>
+            <label className="text-sm font-medium text-gray-700">Number of Questions</label>
             <div className="flex items-center gap-4">
               <input
                 type="range"
@@ -164,11 +167,7 @@ export function QuizConfig({ open, onOpenChange, preselectedPdfId }: QuizConfigP
             </div>
             {selectedPdfId && (
               <p className="text-xs text-gray-500">
-                {countsLoading ? (
-                  'Loading...'
-                ) : (
-                  `${availableQuestions} questions available`
-                )}
+                {countsLoading ? 'Loading...' : `${availableQuestions} questions available`}
               </p>
             )}
           </div>

@@ -1,10 +1,5 @@
 import { api } from '@/lib/api';
-import type { 
-  PDF,
-  PDFListResponse, 
-  PDFUploadResponse,
-  PDFWithStats 
-} from '@/types';
+import type { PDF, PDFListResponse, PDFUploadResponse, PDFWithStats } from '@/types';
 
 export interface PDFListParams {
   page?: number;
@@ -41,10 +36,8 @@ export const pdfService = {
       },
     });
     const data = response.data.data;
-    return {
-      ...data,
-      pdf: transformPdf(data.pdf),
-    };
+    // Backend returns the PDF object directly in data
+    return transformPdf(data);
   },
 
   /**
@@ -63,9 +56,7 @@ export const pdfService = {
    * Get a single PDF by ID
    */
   async getById(id: string): Promise<PDFWithStats> {
-    const response = await api.get<{ success: boolean; data: PDFWithStats }>(
-      `/api/v1/pdfs/${id}`
-    );
+    const response = await api.get<{ success: boolean; data: PDFWithStats }>(`/api/v1/pdfs/${id}`);
     return transformPdf(response.data.data);
   },
 
@@ -73,9 +64,9 @@ export const pdfService = {
    * Get PDF processing status
    */
   async getStatus(id: string): Promise<{ status: string; progress?: number; step?: string }> {
-    const response = await api.get<{ 
-      success: boolean; 
-      data: { status: string; progress?: number; step?: string } 
+    const response = await api.get<{
+      success: boolean;
+      data: { status: string; progress?: number; step?: string };
     }>(`/api/v1/pdfs/${id}/status`);
     return response.data.data;
   },

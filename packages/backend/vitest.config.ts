@@ -12,12 +12,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.ts'],
-      exclude: [
-        'src/index.ts',
-        'src/**/*.d.ts',
-        'src/db/migrate.ts',
-        'src/db/seed.ts',
-      ],
+      exclude: ['src/index.ts', 'src/**/*.d.ts', 'src/db/migrate.ts', 'src/db/seed.ts'],
       thresholds: {
         global: {
           branches: 80,

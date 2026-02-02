@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { cn } from '@/utils/cn';
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -16,16 +17,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
   (
-    {
-      className,
-      width,
-      height,
-      circle = false,
-      count = 1,
-      animation = 'shimmer',
-      style,
-      ...props
-    },
+    { className, width, height, circle = false, count = 1, animation = 'shimmer', style, ...props },
     ref
   ) => {
     const baseClasses = cn(
@@ -75,11 +67,7 @@ const SkeletonText: React.FC<{ lines?: number; className?: string }> = ({
 }) => (
   <div className={cn('space-y-2', className)}>
     {Array.from({ length: lines }).map((_, index) => (
-      <Skeleton
-        key={index}
-        height={16}
-        width={index === lines - 1 ? '60%' : '100%'}
-      />
+      <Skeleton key={index} height={16} width={index === lines - 1 ? '60%' : '100%'} />
     ))}
   </div>
 );
@@ -93,14 +81,7 @@ const SkeletonAvatar: React.FC<{
     md: 48,
     lg: 64,
   };
-  return (
-    <Skeleton
-      circle
-      width={sizeMap[size]}
-      height={sizeMap[size]}
-      className={className}
-    />
-  );
+  return <Skeleton circle width={sizeMap[size]} height={sizeMap[size]} className={className} />;
 };
 
 const SkeletonButton: React.FC<{
@@ -122,12 +103,7 @@ const SkeletonButton: React.FC<{
 };
 
 const SkeletonCard: React.FC<{ className?: string }> = ({ className }) => (
-  <div
-    className={cn(
-      'rounded-lg border border-gray-200 p-4 space-y-4',
-      className
-    )}
-  >
+  <div className={cn('rounded-lg border border-gray-200 p-4 space-y-4', className)}>
     <div className="flex items-center space-x-4">
       <SkeletonAvatar />
       <div className="flex-1 space-y-2">
@@ -167,31 +143,26 @@ const SkeletonTable: React.FC<{
 );
 
 const SkeletonQuizCard: React.FC<{ className?: string }> = ({ className }) => (
-  <div
-    className={cn(
-      'rounded-xl border border-gray-200 p-6 space-y-6',
-      className
-    )}
-  >
+  <div className={cn('rounded-xl border border-gray-200 p-6 space-y-6', className)}>
     {/* Question number and timer */}
     <div className="flex items-center justify-between">
       <Skeleton height={24} width={120} />
       <Skeleton height={24} width={80} />
     </div>
-    
+
     {/* Question text */}
     <div className="space-y-2">
       <Skeleton height={24} width="100%" />
       <Skeleton height={24} width="80%" />
     </div>
-    
+
     {/* Answer options */}
     <div className="space-y-3">
       {Array.from({ length: 4 }).map((_, i) => (
         <Skeleton key={i} height={56} className="rounded-lg" />
       ))}
     </div>
-    
+
     {/* Navigation buttons */}
     <div className="flex justify-between pt-4">
       <SkeletonButton />
@@ -212,13 +183,13 @@ const SkeletonDashboard: React.FC<{ className?: string }> = ({ className }) => (
         </div>
       ))}
     </div>
-    
+
     {/* Chart area */}
     <div className="rounded-lg border border-gray-200 p-4 space-y-4">
       <Skeleton height={24} width={200} />
       <Skeleton height={200} />
     </div>
-    
+
     {/* Recent activity */}
     <div className="rounded-lg border border-gray-200 p-4 space-y-4">
       <Skeleton height={24} width={150} />

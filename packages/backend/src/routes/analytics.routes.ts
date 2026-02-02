@@ -3,14 +3,11 @@
  * User statistics, dashboard data, and advanced analytics
  */
 import { Router } from 'express';
-import {
-  authenticate,
-  authorize,
-  asyncHandler,
-} from '../middleware';
-import { analyticsService } from '../services/analytics.service';
-import { advancedAnalyticsService } from '../services/advanced-analytics.service';
+
+import { authenticate, authorize, asyncHandler } from '../middleware';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { advancedAnalyticsService } from '../services/advanced-analytics.service';
+import { analyticsService } from '../services/analytics.service';
 
 const router = Router();
 

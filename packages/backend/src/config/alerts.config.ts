@@ -1,6 +1,6 @@
 /**
  * Alert Configuration
- * 
+ *
  * Defines alert rules, thresholds, and notification settings.
  * Email alerts are sent via configured SMTP server.
  */
@@ -287,9 +287,9 @@ export const alertTemplates = {
 
 // Cooldown periods to prevent alert fatigue
 export const alertCooldowns = {
-  info: 3600,      // 1 hour
-  warning: 1800,   // 30 minutes
-  critical: 300,   // 5 minutes
+  info: 3600, // 1 hour
+  warning: 1800, // 30 minutes
+  critical: 300, // 5 minutes
 };
 
 // Escalation configuration

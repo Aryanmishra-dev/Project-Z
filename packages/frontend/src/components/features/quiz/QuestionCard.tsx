@@ -1,9 +1,10 @@
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import { Check, X } from 'lucide-react';
+
 import { Badge } from '@/components/ui';
-import { DIFFICULTY_CONFIG } from '@/utils/constants';
-import { cn } from '@/utils/cn';
 import type { Question } from '@/types';
+import { cn } from '@/utils/cn';
+import { DIFFICULTY_CONFIG } from '@/utils/constants';
 
 interface QuestionCardProps {
   question: Question;
@@ -38,8 +39,8 @@ export function QuestionCard({
             question.difficulty === 'easy'
               ? 'success'
               : question.difficulty === 'medium'
-              ? 'warning'
-              : 'error'
+                ? 'warning'
+                : 'error'
           }
         >
           {difficultyConfig.label}
@@ -47,9 +48,7 @@ export function QuestionCard({
       </div>
 
       {/* Question text */}
-      <h2 className="text-xl font-medium text-gray-900 leading-relaxed">
-        {question.questionText}
-      </h2>
+      <h2 className="text-xl font-medium text-gray-900 leading-relaxed">{question.questionText}</h2>
 
       {/* Options */}
       <RadioGroup.Root
@@ -75,7 +74,10 @@ export function QuestionCard({
                 isSelected && !showAnswer && 'border-primary-500 bg-primary-50',
                 showCorrectIndicator && 'border-success-500 bg-success-50',
                 showIncorrectIndicator && 'border-error-500 bg-error-50',
-                !isSelected && !showCorrectIndicator && !showIncorrectIndicator && 'border-gray-200',
+                !isSelected &&
+                  !showCorrectIndicator &&
+                  !showIncorrectIndicator &&
+                  'border-gray-200',
                 disabled && !showAnswer && 'cursor-not-allowed opacity-60'
               )}
             >
@@ -85,7 +87,10 @@ export function QuestionCard({
                   isSelected && !showAnswer && 'border-primary-500 bg-primary-500 text-white',
                   showCorrectIndicator && 'border-success-500 bg-success-500 text-white',
                   showIncorrectIndicator && 'border-error-500 bg-error-500 text-white',
-                  !isSelected && !showCorrectIndicator && !showIncorrectIndicator && 'border-gray-300'
+                  !isSelected &&
+                    !showCorrectIndicator &&
+                    !showIncorrectIndicator &&
+                    'border-gray-300'
                 )}
               >
                 {showCorrectIndicator ? (

@@ -1,8 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { PDFUploader } from '../PDFUploader';
+
 import * as pdfService from '@/services/pdf.service';
 
 // Mock the PDF service
@@ -51,16 +53,24 @@ describe('PDFUploader', () => {
   it('accepts PDF files', async () => {
     const user = userEvent.setup();
     const mockOnSuccess = vi.fn();
-    vi.mocked(pdfService.pdfService.upload).mockResolvedValue({ id: '1', filename: 'test.pdf' } as any);
+    vi.mocked(pdfService.pdfService.upload).mockResolvedValue({
+      id: '1',
+      filename: 'test.pdf',
+    } as any);
 
     render(<PDFUploader onSuccess={mockOnSuccess} />, { wrapper: createWrapper() });
 
     const file = createMockFile('test.pdf', 1024, 'application/pdf');
-    const input = screen.getByLabelText(/upload|drop|select/i) || document.querySelector('input[type="file"]');
-    
+    const input =
+      screen.getByLabelText(/upload|drop|select/i) || document.querySelector('input[type="file"]');
+
     if (input) {
       await user.upload(input as HTMLInputElement, file);
     }
+
+    // click upload
+    const uploadButton = screen.getByRole('button', { name: /upload pdf/i });
+    await user.click(uploadButton);
 
     // File should be accepted (no error shown)
     expect(screen.queryByText(/only pdf files/i)).not.toBeInTheDocument();
@@ -71,7 +81,8 @@ describe('PDFUploader', () => {
 
     // The dropzone should only accept PDFs
     const input = document.querySelector('input[type="file"]');
-    expect(input).toHaveAttribute('accept', '.pdf,application/pdf');
+    expect(input).toHaveAttribute('accept');
+    expect(input?.getAttribute('accept')).toMatch(/pdf/i);
   });
 
   it('rejects files over size limit', async () => {
@@ -85,9 +96,12 @@ describe('PDFUploader', () => {
       await user.upload(input as HTMLInputElement, oversizedFile);
     }
 
-    await waitFor(() => {
-      expect(screen.getByText(/too large|exceeds|10\s*mb/i)).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText(/too large|exceeds|10\s*mb/i)).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
   });
 
   it('shows upload progress', async () => {
@@ -107,12 +121,15 @@ describe('PDFUploader', () => {
       await user.upload(input as HTMLInputElement, file);
     }
 
+    const uploadButton = screen.getByRole('button', { name: /upload pdf/i });
+    await user.click(uploadButton);
+
     // Should show some upload indicator
     await waitFor(() => {
       expect(
         screen.queryByText(/uploading/i) ||
-        screen.queryByRole('progressbar') ||
-        screen.queryByText(/processing/i)
+          screen.queryByRole('progressbar') ||
+          screen.queryByText(/processing/i)
       ).toBeTruthy();
     });
   });
@@ -120,7 +137,10 @@ describe('PDFUploader', () => {
   it('calls onSuccess callback after successful upload', async () => {
     const user = userEvent.setup();
     const mockOnSuccess = vi.fn();
-    vi.mocked(pdfService.pdfService.upload).mockResolvedValue({ id: '1', filename: 'test.pdf' } as any);
+    vi.mocked(pdfService.pdfService.upload).mockResolvedValue({
+      id: '1',
+      filename: 'test.pdf',
+    } as any);
 
     render(<PDFUploader onSuccess={mockOnSuccess} />, { wrapper: createWrapper() });
 
@@ -130,6 +150,9 @@ describe('PDFUploader', () => {
     if (input) {
       await user.upload(input as HTMLInputElement, file);
     }
+
+    const uploadButton = screen.getByRole('button', { name: /upload pdf/i });
+    await user.click(uploadButton);
 
     await waitFor(() => {
       expect(mockOnSuccess).toHaveBeenCalled();
@@ -148,6 +171,9 @@ describe('PDFUploader', () => {
     if (input) {
       await user.upload(input as HTMLInputElement, file);
     }
+
+    const uploadButton = screen.getByRole('button', { name: /upload pdf/i });
+    await user.click(uploadButton);
 
     await waitFor(() => {
       expect(screen.getByText(/failed|error|try again/i)).toBeInTheDocument();

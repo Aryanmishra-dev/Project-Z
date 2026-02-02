@@ -1,4 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+
 import { API_BASE_URL } from '@/utils/constants';
 
 /**
@@ -47,11 +48,7 @@ api.interceptors.response.use(
 
     // Network error
     if (!error.response) {
-      throw new ApiError(
-        'Network error. Please check your connection.',
-        'NETWORK_ERROR',
-        0
-      );
+      throw new ApiError('Network error. Please check your connection.', 'NETWORK_ERROR', 0);
     }
 
     const status = error.response.status;
@@ -84,30 +81,18 @@ api.interceptors.response.use(
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';
-        throw new ApiError(
-          'Session expired. Please log in again.',
-          'SESSION_EXPIRED',
-          401
-        );
+        throw new ApiError('Session expired. Please log in again.', 'SESSION_EXPIRED', 401);
       }
     }
 
     // Handle rate limiting
     if (status === 429) {
-      throw new ApiError(
-        'Too many requests. Please wait a moment.',
-        'RATE_LIMITED',
-        429
-      );
+      throw new ApiError('Too many requests. Please wait a moment.', 'RATE_LIMITED', 429);
     }
 
     // Handle server errors
     if (status >= 500) {
-      throw new ApiError(
-        'Server error. Please try again later.',
-        'SERVER_ERROR',
-        status
-      );
+      throw new ApiError('Server error. Please try again later.', 'SERVER_ERROR', status);
     }
 
     // Handle validation errors
@@ -122,20 +107,12 @@ api.interceptors.response.use(
 
     // Handle forbidden
     if (status === 403) {
-      throw new ApiError(
-        'You do not have permission to perform this action.',
-        'FORBIDDEN',
-        403
-      );
+      throw new ApiError('You do not have permission to perform this action.', 'FORBIDDEN', 403);
     }
 
     // Handle not found
     if (status === 404) {
-      throw new ApiError(
-        'Resource not found.',
-        'NOT_FOUND',
-        404
-      );
+      throw new ApiError('Resource not found.', 'NOT_FOUND', 404);
     }
 
     // Generic error
@@ -168,4 +145,3 @@ export function isApiError(error: unknown, code?: string): error is ApiError {
   }
   return false;
 }
-

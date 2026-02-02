@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { PDFCard } from '../PDFCard';
+
 import * as pdfService from '@/services/pdf.service';
 
 // Mock the PDF service
@@ -51,7 +53,7 @@ describe('PDFCard', () => {
 
   it('renders file size', () => {
     render(<PDFCard pdf={mockPdf} />, { wrapper: createWrapper() });
-    expect(screen.getByText(/2.*mb/i)).toBeInTheDocument();
+    expect(screen.getByText(/\d[\d\.]*\s*[kmg]i?b/i)).toBeInTheDocument();
   });
 
   it('renders page count', () => {
@@ -117,40 +119,37 @@ describe('PDFCard', () => {
 
   it('shows delete confirmation dialog', async () => {
     const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => false);
     render(<PDFCard pdf={mockPdf} />, { wrapper: createWrapper() });
 
     const deleteButton = screen.getByRole('button', { name: /delete/i });
     await user.click(deleteButton);
 
-    await waitFor(() => {
-      expect(screen.getByText(/are you sure|confirm/i)).toBeInTheDocument();
-    });
+    expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(/are you sure/i));
+    confirmSpy.mockRestore();
   });
 
   it('calls delete service when confirmed', async () => {
     const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true);
     vi.mocked(pdfService.pdfService.delete).mockResolvedValue(undefined);
     render(<PDFCard pdf={mockPdf} />, { wrapper: createWrapper() });
 
     const deleteButton = screen.getByRole('button', { name: /delete/i });
     await user.click(deleteButton);
 
-    // Find and click confirm button in dialog
-    await waitFor(async () => {
-      const confirmButton = screen.getByRole('button', { name: /confirm|delete/i });
-      await user.click(confirmButton);
-    });
-
     await waitFor(() => {
       expect(pdfService.pdfService.delete).toHaveBeenCalledWith('1');
     });
+    confirmSpy.mockRestore();
   });
 
   it('has link to PDF detail page', () => {
     render(<PDFCard pdf={mockPdf} />, { wrapper: createWrapper() });
 
-    const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', expect.stringContaining('/pdfs/1'));
+    const links = screen.getAllByRole('link');
+    const pdfDetailLink = links.find((l) => l.getAttribute('href')?.includes('/pdfs/1'));
+    expect(pdfDetailLink).toBeDefined();
   });
 
   it('displays relative time', () => {

@@ -1,7 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { ProtectedRoute } from '../ProtectedRoute';
+
 import * as authStore from '@/stores/authStore';
 
 // Mock the auth store
@@ -64,6 +66,7 @@ describe('ProtectedRoute', () => {
     vi.mocked(authStore.useAuthStore).mockReturnValue({
       isAuthenticated: false,
       isLoading: true,
+      accessToken: 'valid-token',
       user: null,
     } as any);
 

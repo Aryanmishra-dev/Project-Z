@@ -1,10 +1,11 @@
 /**
  * Analytics Routes Integration Tests
  */
-import { describe, it, expect, vi, beforeAll } from 'vitest';
-import request from 'supertest';
-import { createApp } from '../../src/app';
 import { Express } from 'express';
+import request from 'supertest';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
+
+import { createApp } from '../../src/app';
 
 // Mock dependencies
 vi.mock('../../src/db', () => ({
@@ -69,7 +70,7 @@ vi.mock('../../src/middleware/auth', async () => {
 
 describe('Analytics Routes', () => {
   let app: Express;
-  
+
   beforeAll(() => {
     app = createApp();
   });

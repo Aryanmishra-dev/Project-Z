@@ -1,6 +1,7 @@
-import { Router } from 'express';
-import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { Router } from 'express';
+
+import { db } from '../db';
 
 export const healthRouter = Router();
 
@@ -11,7 +12,7 @@ healthRouter.get('/', async (_req, res) => {
   try {
     // Check database connection
     await db.execute(sql`SELECT 1`);
-    
+
     res.json({
       success: true,
       status: 'healthy',

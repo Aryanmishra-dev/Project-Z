@@ -1,6 +1,7 @@
-import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
+import * as React from 'react';
+
 import { cn } from '@/utils/cn';
 
 const spinnerVariants = cva('animate-spin text-primary-600', {
@@ -18,8 +19,7 @@ const spinnerVariants = cva('animate-spin text-primary-600', {
 });
 
 export interface SpinnerProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof spinnerVariants> {
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof spinnerVariants> {
   label?: string;
 }
 

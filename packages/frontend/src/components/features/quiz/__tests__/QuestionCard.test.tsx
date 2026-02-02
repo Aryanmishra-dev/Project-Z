@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
 import { QuestionCard } from '../QuestionCard';
 
 const mockQuestion = {
@@ -13,7 +14,8 @@ const mockQuestion = {
     { id: 'd', text: 'Madrid' },
   ],
   difficulty: 'medium' as const,
-  correctAnswer: 'c',
+  correctOptionId: '2',
+  correctOptionIndex: 2,
   explanation: 'Paris is the capital and largest city of France.',
 };
 
@@ -24,7 +26,7 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        onAnswer={vi.fn()}
+        onSelect={vi.fn()}
       />
     );
 
@@ -37,7 +39,7 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        onAnswer={vi.fn()}
+        onSelect={vi.fn()}
       />
     );
 
@@ -53,7 +55,7 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={3}
         totalQuestions={10}
-        onAnswer={vi.fn()}
+        onSelect={vi.fn()}
       />
     );
 
@@ -66,7 +68,7 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        onAnswer={vi.fn()}
+        onSelect={vi.fn()}
       />
     );
 
@@ -82,12 +84,13 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        onAnswer={onAnswer}
+        onSelect={onAnswer}
       />
     );
 
     await user.click(screen.getByText('Paris'));
-    expect(onAnswer).toHaveBeenCalledWith('c');
+    // Paris is index 2 (a, b, c) -> 0, 1, 2
+    expect(onAnswer).toHaveBeenCalledWith(2);
   });
 
   it('shows selected option visually', async () => {
@@ -98,8 +101,8 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer="c"
-        onAnswer={vi.fn()}
+        selectedOption={2}
+        onSelect={vi.fn()}
       />
     );
 
@@ -114,9 +117,9 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer="b"
-        showResult={true}
-        onAnswer={vi.fn()}
+        selectedOption={1} // Berlin (index 1) - Correct is Paris (index 2)
+        showAnswer={true}
+        onSelect={vi.fn()}
       />
     );
 
@@ -135,9 +138,9 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer="c"
-        showResult={true}
-        onAnswer={vi.fn()}
+        selectedOption={2}
+        showAnswer={true}
+        onSelect={vi.fn()}
       />
     );
 
@@ -153,9 +156,9 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer="c"
-        showResult={true}
-        onAnswer={onAnswer}
+        selectedOption={2}
+        showAnswer={true}
+        onSelect={onAnswer}
       />
     );
 
@@ -169,7 +172,7 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        onAnswer={vi.fn()}
+        onSelect={vi.fn()}
       />
     );
 
@@ -186,13 +189,13 @@ describe('QuestionCard', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        onAnswer={onAnswer}
+        onSelect={onAnswer}
       />
     );
 
     // Tab to first option and select with Enter
     await user.tab();
-    await user.keyboard('{Enter}');
+    await user.keyboard(' ');
 
     expect(onAnswer).toHaveBeenCalled();
   });

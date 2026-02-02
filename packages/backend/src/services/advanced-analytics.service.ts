@@ -2,15 +2,16 @@
  * Advanced Analytics Service
  * Comprehensive learning analytics, insights, and performance tracking
  */
-import { db } from '../db';
+import { subDays, startOfDay, format, getHours } from 'date-fns';
+import { eq, and, sql, desc, gte, lte, count, avg, sum } from 'drizzle-orm';
+
 import { redis } from '../config/redis';
+import { db } from '../db';
+import { pdfs } from '../db/schema/pdfs';
+import { questions } from '../db/schema/questions';
 import { quizSessions } from '../db/schema/quiz-sessions';
 import { userAnswers } from '../db/schema/user-answers';
-import { questions } from '../db/schema/questions';
-import { pdfs } from '../db/schema/pdfs';
-import { eq, and, sql, desc, gte, lte, count, avg, sum } from 'drizzle-orm';
 import { logger } from '../utils/logger';
-import { subDays, startOfDay, format, getHours } from 'date-fns';
 
 /**
  * Cache TTL values (in seconds)
@@ -246,7 +247,10 @@ class AdvancedAnalyticsService {
   /**
    * Calculate overall trend from daily scores
    */
-  private calculateTrend(dailyScores: DailyScore[]): { overallTrend: 'improving' | 'stable' | 'declining'; improvementRate: number } {
+  private calculateTrend(dailyScores: DailyScore[]): {
+    overallTrend: 'improving' | 'stable' | 'declining';
+    improvementRate: number;
+  } {
     if (dailyScores.length < 7) {
       return { overallTrend: 'stable', improvementRate: 0 };
     }
@@ -259,9 +263,10 @@ class AdvancedAnalyticsService {
     const firstWeekAvg = firstWeek.reduce((sum, d) => sum + d.avgScore, 0) / firstWeek.length;
     const lastWeekAvg = lastWeek.reduce((sum, d) => sum + d.avgScore, 0) / lastWeek.length;
 
-    const improvementRate = firstWeekAvg > 0 
-      ? Math.round(((lastWeekAvg - firstWeekAvg) / firstWeekAvg) * 10000) / 100
-      : 0;
+    const improvementRate =
+      firstWeekAvg > 0
+        ? Math.round(((lastWeekAvg - firstWeekAvg) / firstWeekAvg) * 10000) / 100
+        : 0;
 
     let overallTrend: 'improving' | 'stable' | 'declining' = 'stable';
     if (improvementRate > 5) overallTrend = 'improving';
@@ -319,7 +324,8 @@ class AdvancedAnalyticsService {
 
     const weakQuestions: WeakQuestion[] = weakQuestionsResults.map((row) => ({
       questionId: row.questionId,
-      questionText: row.questionText.substring(0, 200) + (row.questionText.length > 200 ? '...' : ''),
+      questionText:
+        row.questionText.substring(0, 200) + (row.questionText.length > 200 ? '...' : ''),
       pdfFilename: row.pdfFilename,
       pdfId: row.pdfId,
       difficulty: row.difficulty,
@@ -358,7 +364,9 @@ class AdvancedAnalyticsService {
       .innerJoin(pdfs, eq(questions.pdfId, pdfs.id))
       .where(eq(quizSessions.userId, userId))
       .groupBy(pdfs.id, pdfs.filename)
-      .having(sql`(SUM(CASE WHEN ${userAnswers.isCorrect} THEN 1 ELSE 0 END)::float / COUNT(*)) < 0.7`)
+      .having(
+        sql`(SUM(CASE WHEN ${userAnswers.isCorrect} THEN 1 ELSE 0 END)::float / COUNT(*)) < 0.7`
+      )
       .orderBy(desc(sql`COUNT(DISTINCT ${userAnswers.questionId})`))
       .limit(5);
 
@@ -410,24 +418,20 @@ class AdvancedAnalyticsService {
         quizCount: count(),
       })
       .from(quizSessions)
-      .where(
-        and(
-          eq(quizSessions.userId, userId),
-          eq(quizSessions.status, 'completed')
-        )
-      )
+      .where(and(eq(quizSessions.userId, userId), eq(quizSessions.status, 'completed')))
       .groupBy(sql`EXTRACT(HOUR FROM ${quizSessions.startedAt})`)
       .having(sql`COUNT(*) >= 3`)
       .orderBy(desc(sql`AVG(${quizSessions.scorePercentage})`))
       .limit(1);
 
-    const bestTimeOfDay = timeOfDayResults.length > 0
-      ? {
-          hour: timeOfDayResults[0].hour,
-          avgScore: Math.round(timeOfDayResults[0].avgScore * 100) / 100,
-          quizCount: Number(timeOfDayResults[0].quizCount),
-        }
-      : null;
+    const bestTimeOfDay =
+      timeOfDayResults.length > 0
+        ? {
+            hour: timeOfDayResults[0].hour,
+            avgScore: Math.round(timeOfDayResults[0].avgScore * 100) / 100,
+            quizCount: Number(timeOfDayResults[0].quizCount),
+          }
+        : null;
 
     // Optimal quiz length
     const quizLengthResults = await db
@@ -437,24 +441,20 @@ class AdvancedAnalyticsService {
         quizCount: count(),
       })
       .from(quizSessions)
-      .where(
-        and(
-          eq(quizSessions.userId, userId),
-          eq(quizSessions.status, 'completed')
-        )
-      )
+      .where(and(eq(quizSessions.userId, userId), eq(quizSessions.status, 'completed')))
       .groupBy(quizSessions.totalQuestions)
       .having(sql`COUNT(*) >= 3`)
       .orderBy(desc(sql`AVG(${quizSessions.scorePercentage})`))
       .limit(1);
 
-    const optimalQuizLength = quizLengthResults.length > 0
-      ? {
-          questionCount: quizLengthResults[0].questionCount,
-          avgScore: Math.round(quizLengthResults[0].avgScore * 100) / 100,
-          quizCount: Number(quizLengthResults[0].quizCount),
-        }
-      : null;
+    const optimalQuizLength =
+      quizLengthResults.length > 0
+        ? {
+            questionCount: quizLengthResults[0].questionCount,
+            avgScore: Math.round(quizLengthResults[0].avgScore * 100) / 100,
+            quizCount: Number(quizLengthResults[0].quizCount),
+          }
+        : null;
 
     // Retention analysis (retake improvement)
     const retakeResults = await db
@@ -465,32 +465,23 @@ class AdvancedAnalyticsService {
         lastScore: sql<number>`MAX(${quizSessions.scorePercentage})::float`,
       })
       .from(quizSessions)
-      .where(
-        and(
-          eq(quizSessions.userId, userId),
-          eq(quizSessions.status, 'completed')
-        )
-      )
+      .where(and(eq(quizSessions.userId, userId), eq(quizSessions.status, 'completed')))
       .groupBy(quizSessions.pdfId)
       .having(sql`COUNT(*) >= 2`);
 
     const totalPdfsWithQuizzes = await db
       .selectDistinct({ pdfId: quizSessions.pdfId })
       .from(quizSessions)
-      .where(
-        and(
-          eq(quizSessions.userId, userId),
-          eq(quizSessions.status, 'completed')
-        )
-      );
+      .where(and(eq(quizSessions.userId, userId), eq(quizSessions.status, 'completed')));
 
-    const pdfRetakeRate = totalPdfsWithQuizzes.length > 0
-      ? retakeResults.length / totalPdfsWithQuizzes.length
-      : 0;
+    const pdfRetakeRate =
+      totalPdfsWithQuizzes.length > 0 ? retakeResults.length / totalPdfsWithQuizzes.length : 0;
 
-    const avgImprovementOnRetake = retakeResults.length > 0
-      ? retakeResults.reduce((sum, r) => sum + (r.lastScore - r.firstScore), 0) / retakeResults.length
-      : 0;
+    const avgImprovementOnRetake =
+      retakeResults.length > 0
+        ? retakeResults.reduce((sum, r) => sum + (r.lastScore - r.firstScore), 0) /
+          retakeResults.length
+        : 0;
 
     // Average time per question
     const timeStats = await db
@@ -509,12 +500,7 @@ class AdvancedAnalyticsService {
         duration: sql<number>`EXTRACT(EPOCH FROM (${quizSessions.completedAt} - ${quizSessions.startedAt}))::int`,
       })
       .from(quizSessions)
-      .where(
-        and(
-          eq(quizSessions.userId, userId),
-          eq(quizSessions.status, 'completed')
-        )
-      )
+      .where(and(eq(quizSessions.userId, userId), eq(quizSessions.status, 'completed')))
       .orderBy(sql`${quizSessions.completedAt} - ${quizSessions.startedAt}`)
       .limit(1);
 
@@ -597,12 +583,7 @@ class AdvancedAnalyticsService {
         date: sql<string>`DATE(${quizSessions.completedAt})`,
       })
       .from(quizSessions)
-      .where(
-        and(
-          eq(quizSessions.userId, userId),
-          eq(quizSessions.status, 'completed')
-        )
-      )
+      .where(and(eq(quizSessions.userId, userId), eq(quizSessions.status, 'completed')))
       .orderBy(sql`DATE(${quizSessions.completedAt})`);
 
     const allDates = allActivityDates.map((d) => d.date);
@@ -633,12 +614,7 @@ class AdvancedAnalyticsService {
         totalQuizzes: count(),
       })
       .from(quizSessions)
-      .where(
-        and(
-          eq(quizSessions.userId, userId),
-          eq(quizSessions.status, 'completed')
-        )
-      );
+      .where(and(eq(quizSessions.userId, userId), eq(quizSessions.status, 'completed')));
 
     const questionsTotals = await db
       .select({
@@ -659,7 +635,8 @@ class AdvancedAnalyticsService {
     const getNextMilestone = (current: number, milestones: number[]) => {
       const next = milestones.find((m) => m > current) || milestones[milestones.length - 1];
       const prevMilestone = milestones.filter((m) => m <= current).pop() || 0;
-      const progress = next > prevMilestone ? ((current - prevMilestone) / (next - prevMilestone)) * 100 : 100;
+      const progress =
+        next > prevMilestone ? ((current - prevMilestone) / (next - prevMilestone)) * 100 : 100;
       return { current, next, progress: Math.min(100, Math.round(progress)) };
     };
 

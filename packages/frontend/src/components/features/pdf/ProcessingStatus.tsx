@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+
 import { Progress } from '@/components/ui';
 import { pdfService } from '@/services/pdf.service';
 import { usePDFStore } from '@/stores/pdfStore';
-import { PROCESSING_STEPS } from '@/utils/constants';
 import { cn } from '@/utils/cn';
+import { PROCESSING_STEPS } from '@/utils/constants';
 
 interface ProcessingStatusProps {
   pdfId: string;
@@ -12,7 +13,7 @@ interface ProcessingStatusProps {
 
 export function ProcessingStatus({ pdfId }: ProcessingStatusProps) {
   const uploadProgress = usePDFStore((state) => state.uploadProgress[pdfId]);
-  
+
   // Poll for status every 5 seconds as a fallback
   const { data: statusData } = useQuery({
     queryKey: ['pdf-status', pdfId],
@@ -54,11 +55,7 @@ export function ProcessingStatus({ pdfId }: ProcessingStatusProps) {
                   !isActive && !isCompleted && 'bg-gray-100'
                 )}
               >
-                {isActive ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <span>{step.icon}</span>
-                )}
+                {isActive ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>{step.icon}</span>}
               </div>
               <span className="mt-1 text-xs hidden sm:block">{step.label}</span>
             </div>

@@ -55,7 +55,7 @@ describe('PDF Service', () => {
       } as any);
 
       const { pdfService } = await import('../../src/services/pdf.service');
-      
+
       const result = await pdfService.create({
         userId: 'user-id',
         filename: 'test.pdf',
@@ -88,7 +88,7 @@ describe('PDF Service', () => {
   describe('Status validation', () => {
     it('should accept valid statuses', () => {
       const validStatuses = ['pending', 'processing', 'completed', 'failed', 'cancelled'];
-      validStatuses.forEach(status => {
+      validStatuses.forEach((status) => {
         expect(['pending', 'processing', 'completed', 'failed', 'cancelled']).toContain(status);
       });
     });

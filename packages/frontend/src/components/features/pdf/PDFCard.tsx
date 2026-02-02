@@ -1,13 +1,15 @@
-import { Link } from 'react-router-dom';
-import { FileText, Clock, HelpCircle, Trash2, Play } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, Button, Badge } from '@/components/ui';
+import { FileText, Clock, HelpCircle, Trash2, Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 import { ProcessingStatus } from './ProcessingStatus';
+
+import { Card, Button, Badge } from '@/components/ui';
 import { pdfService } from '@/services/pdf.service';
-import { formatRelativeTime, formatFileSize, formatCount } from '@/utils/formatters';
-import { ROUTES } from '@/utils/constants';
 import type { PDF } from '@/types';
 import { cn } from '@/utils/cn';
+import { ROUTES } from '@/utils/constants';
+import { formatRelativeTime, formatFileSize, formatCount } from '@/utils/formatters';
 
 interface PDFCardProps {
   pdf: PDF;
@@ -40,14 +42,22 @@ export function PDFCard({ pdf, showActions = true }: PDFCardProps) {
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className={cn(
-              'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
-              isCompleted ? 'bg-success-100' : isFailed ? 'bg-error-100' : 'bg-primary-100'
-            )}>
-              <FileText className={cn(
-                'h-5 w-5',
-                isCompleted ? 'text-success-600' : isFailed ? 'text-error-600' : 'text-primary-600'
-              )} />
+            <div
+              className={cn(
+                'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
+                isCompleted ? 'bg-success-100' : isFailed ? 'bg-error-100' : 'bg-primary-100'
+              )}
+            >
+              <FileText
+                className={cn(
+                  'h-5 w-5',
+                  isCompleted
+                    ? 'text-success-600'
+                    : isFailed
+                      ? 'text-error-600'
+                      : 'text-primary-600'
+                )}
+              />
             </div>
             <div className="min-w-0">
               <Link
@@ -73,10 +83,10 @@ export function PDFCard({ pdf, showActions = true }: PDFCardProps) {
               pdf.status === 'completed'
                 ? 'success'
                 : pdf.status === 'failed'
-                ? 'error'
-                : pdf.status === 'processing'
-                ? 'info'
-                : 'warning'
+                  ? 'error'
+                  : pdf.status === 'processing'
+                    ? 'info'
+                    : 'warning'
             }
           >
             {pdf.status}

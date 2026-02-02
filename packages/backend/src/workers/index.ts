@@ -3,8 +3,4 @@
  * Exports worker instances and utilities
  */
 
-export {
-  pdfProcessingWorker,
-  closeWorker,
-  isWorkerRunning,
-} from './pdf-processor';
+export { pdfProcessingWorker, closeWorker, isWorkerRunning } from './pdf-processor';

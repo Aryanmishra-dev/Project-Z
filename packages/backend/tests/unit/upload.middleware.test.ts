@@ -2,6 +2,7 @@
  * Upload Middleware Unit Tests
  */
 import { describe, it, expect } from 'vitest';
+
 import { sanitizeFilename, validatePdfMagicBytes } from '../../src/middleware/upload';
 
 describe('Upload Middleware', () => {
@@ -133,7 +134,7 @@ describe('Path Traversal Prevention', () => {
       'file%00.pdf',
     ];
 
-    maliciousInputs.forEach(input => {
+    maliciousInputs.forEach((input) => {
       const result = sanitizeFilename(input);
       expect(result).not.toContain('..');
       expect(result).not.toContain('/');

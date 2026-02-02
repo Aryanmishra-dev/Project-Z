@@ -4,6 +4,7 @@
  */
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pkg from 'pg';
+
 const { Pool } = pkg;
 import * as schema from '../db/schema';
 import { logger } from '../utils/logger';
@@ -12,7 +13,8 @@ import { logger } from '../utils/logger';
  * Database configuration from environment
  */
 const databaseConfig = {
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/quiz_dev',
+  connectionString:
+    process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/quiz_dev',
   max: parseInt(process.env.DATABASE_POOL_MAX || '20', 10),
   min: parseInt(process.env.DATABASE_POOL_MIN || '5', 10),
   idleTimeoutMillis: 30000,
@@ -52,8 +54,8 @@ export async function checkDatabaseConnection(): Promise<boolean> {
     logger.info('Database connection verified');
     return true;
   } catch (error) {
-    logger.error('Database connection failed', { 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    logger.error('Database connection failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     return false;
   }

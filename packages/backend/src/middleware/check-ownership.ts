@@ -2,13 +2,14 @@
  * Ownership check middleware
  * Verifies resources belong to the authenticated user
  */
-import { Response, NextFunction } from 'express';
 import { eq, and, isNull } from 'drizzle-orm';
+import { Response, NextFunction } from 'express';
+
 import { AuthenticatedRequest } from './auth';
-import { AuthorizationError, NotFoundError } from '../utils/errors';
 import { db } from '../db';
 import { pdfs } from '../db/schema/pdfs';
 import { quizSessions } from '../db/schema/quiz-sessions';
+import { AuthorizationError, NotFoundError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
 /**
@@ -22,11 +23,7 @@ export type ResourceType = 'pdf' | 'quiz-session';
  * @param paramName Request parameter containing resource ID
  */
 export function checkOwnership(resourceType: ResourceType, paramName = 'id') {
-  return async (
-    req: AuthenticatedRequest,
-    _res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  return async (req: AuthenticatedRequest, _res: Response, next: NextFunction): Promise<void> => {
     try {
       if (!req.user) {
         throw new AuthorizationError('Authentication required');
@@ -45,10 +42,7 @@ export function checkOwnership(resourceType: ResourceType, paramName = 'id') {
           const [pdf] = await db
             .select({ userId: pdfs.userId })
             .from(pdfs)
-            .where(and(
-              eq(pdfs.id, resourceId),
-              isNull(pdfs.deletedAt)
-            ))
+            .where(and(eq(pdfs.id, resourceId), isNull(pdfs.deletedAt)))
             .limit(1);
 
           if (!pdf) {

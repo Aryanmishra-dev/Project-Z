@@ -1,9 +1,5 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   User,
   Lock,
@@ -17,6 +13,11 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+
 import {
   Card,
   CardHeader,
@@ -29,32 +30,36 @@ import {
 } from '@/components/ui';
 import { settingsService, UserSession } from '@/services/settings.service';
 import { useAuthStore } from '@/stores/authStore';
-import { toast } from '@/utils/toast';
 import { cn } from '@/utils/cn';
 import { formatRelativeTime } from '@/utils/formatters';
+import { toast } from '@/utils/toast';
 
 // Validation schemas
-const profileSchema = z.object({
-  fullName: z.string().min(2, 'Name must be at least 2 characters').max(100).optional(),
-  email: z.string().email('Invalid email address').optional(),
-}).refine(data => data.fullName || data.email, {
-  message: 'At least one field is required',
-});
+const profileSchema = z
+  .object({
+    fullName: z.string().min(2, 'Name must be at least 2 characters').max(100).optional(),
+    email: z.string().email('Invalid email address').optional(),
+  })
+  .refine((data) => data.fullName || data.email, {
+    message: 'At least one field is required',
+  });
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Must contain uppercase letter')
-    .regex(/[a-z]/, 'Must contain lowercase letter')
-    .regex(/[0-9]/, 'Must contain number')
-    .regex(/[^A-Za-z0-9]/, 'Must contain special character'),
-  confirmPassword: z.string(),
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Must contain uppercase letter')
+      .regex(/[a-z]/, 'Must contain lowercase letter')
+      .regex(/[0-9]/, 'Must contain number')
+      .regex(/[^A-Za-z0-9]/, 'Must contain special character'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 type PasswordFormData = z.infer<typeof passwordSchema>;
@@ -235,10 +240,7 @@ export function SettingsPage() {
             </div>
 
             <div className="pt-2">
-              <Button
-                type="submit"
-                disabled={updateProfileMutation.isPending}
-              >
+              <Button type="submit" disabled={updateProfileMutation.isPending}>
                 {updateProfileMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -279,7 +281,11 @@ export function SettingsPage() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                 >
-                  {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showCurrentPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
               {passwordForm.formState.errors.currentPassword && (
@@ -313,7 +319,9 @@ export function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Confirm New Password
+              </label>
               <Input
                 {...passwordForm.register('confirmPassword')}
                 type="password"
@@ -328,10 +336,7 @@ export function SettingsPage() {
             </div>
 
             <div className="pt-2">
-              <Button
-                type="submit"
-                disabled={changePasswordMutation.isPending}
-              >
+              <Button type="submit" disabled={changePasswordMutation.isPending}>
                 {changePasswordMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -389,13 +394,11 @@ export function SettingsPage() {
                         <p className="font-medium text-gray-900">
                           {session.deviceInfo || 'Unknown Device'}
                         </p>
-                        {session.isCurrent && (
-                          <Badge variant="primary">Current</Badge>
-                        )}
+                        {session.isCurrent && <Badge variant="primary">Current</Badge>}
                       </div>
                       <p className="text-sm text-gray-500">
-                        {session.ipAddress || 'Unknown IP'} •{' '}
-                        Last active {formatRelativeTime(session.lastUsed)}
+                        {session.ipAddress || 'Unknown IP'} • Last active{' '}
+                        {formatRelativeTime(session.lastUsed)}
                       </p>
                     </div>
                   </div>
@@ -461,7 +464,8 @@ export function SettingsPage() {
             <div>
               <h3 className="font-medium text-gray-900">Delete Account</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Once you delete your account, there is no going back. All your data will be permanently removed.
+                Once you delete your account, there is no going back. All your data will be
+                permanently removed.
               </p>
             </div>
 

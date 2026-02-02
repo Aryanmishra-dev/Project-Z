@@ -3,9 +3,10 @@
  * Initializes connections and starts the server
  */
 import 'dotenv/config';
-import { createApp, startServer } from './app';
+import { startServer } from './app';
 import { checkDatabaseConnection, closeDatabaseConnection } from './config/database';
 import { redis, closeRedisConnection } from './config/redis';
+import './workers'; // Initialize workers
 import { logger } from './utils/logger';
 
 /**
@@ -13,16 +14,16 @@ import { logger } from './utils/logger';
  */
 async function shutdown(signal: string): Promise<void> {
   logger.info(`Received ${signal}, starting graceful shutdown...`);
-  
+
   try {
     // Close Redis connection
     await closeRedisConnection();
     logger.info('Redis connection closed');
-    
+
     // Close database connection
     await closeDatabaseConnection();
     logger.info('Database connection closed');
-    
+
     process.exit(0);
   } catch (error) {
     logger.error('Error during shutdown', { error });
@@ -41,21 +42,20 @@ async function main(): Promise<void> {
       throw new Error('Failed to connect to database');
     }
     logger.info('Database connection established');
-    
+
     // Verify Redis connection
     const redisStatus = await redis.ping();
     if (redisStatus !== 'PONG') {
       throw new Error('Failed to connect to Redis');
     }
     logger.info('Redis connection established');
-    
+
     // Start server
     await startServer();
-    
+
     // Setup graceful shutdown
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     process.on('SIGINT', () => shutdown('SIGINT'));
-    
   } catch (error) {
     logger.error('Failed to start server', { error });
     process.exit(1);

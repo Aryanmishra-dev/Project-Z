@@ -1,5 +1,6 @@
-import * as React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import * as React from 'react';
+
 import { Button, Card, CardContent } from '@/components/ui';
 
 interface ErrorBoundaryProps {
@@ -12,10 +13,7 @@ interface ErrorBoundaryState {
   error?: Error;
 }
 
-export class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -46,9 +44,7 @@ export class ErrorBoundary extends React.Component<
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-error-100">
                 <AlertTriangle className="h-6 w-6 text-error-600" />
               </div>
-              <h2 className="mt-4 text-lg font-semibold text-gray-900">
-                Something went wrong
-              </h2>
+              <h2 className="mt-4 text-lg font-semibold text-gray-900">Something went wrong</h2>
               <p className="mt-2 text-sm text-gray-500">
                 An unexpected error occurred. Please try again.
               </p>
@@ -62,11 +58,7 @@ export class ErrorBoundary extends React.Component<
                   </pre>
                 </details>
               )}
-              <Button
-                onClick={this.handleRetry}
-                className="mt-6"
-                variant="primary"
-              >
+              <Button onClick={this.handleRetry} className="mt-6" variant="primary">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Try again
               </Button>
@@ -94,15 +86,11 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-error-100">
             <AlertTriangle className="h-6 w-6 text-error-600" />
           </div>
-          <h2 className="mt-4 text-lg font-semibold text-gray-900">
-            Oops! Something went wrong
-          </h2>
+          <h2 className="mt-4 text-lg font-semibold text-gray-900">Oops! Something went wrong</h2>
           <p className="mt-2 text-sm text-gray-500">
             We're sorry, but something unexpected happened.
           </p>
-          {error && (
-            <p className="mt-2 text-xs text-gray-400">{error.message}</p>
-          )}
+          {error && <p className="mt-2 text-xs text-gray-400">{error.message}</p>}
           {resetError && (
             <Button onClick={resetError} className="mt-6" variant="primary">
               <RefreshCw className="mr-2 h-4 w-4" />

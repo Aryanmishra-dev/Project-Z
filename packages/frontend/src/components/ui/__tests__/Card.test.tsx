@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../Card';
 
 describe('Card Components', () => {
@@ -18,7 +19,11 @@ describe('Card Components', () => {
     });
 
     it('accepts custom className', () => {
-      render(<Card className="custom-class" data-testid="card">Content</Card>);
+      render(
+        <Card className="custom-class" data-testid="card">
+          Content
+        </Card>
+      );
       expect(screen.getByTestId('card')).toHaveClass('custom-class');
     });
   });

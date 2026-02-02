@@ -4,15 +4,11 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import {
-  authenticate,
-  validate,
-  checkPdfOwnership,
-  asyncHandler,
-} from '../middleware';
-import { questionsService } from '../services/questions.service';
-import { pdfService } from '../services/pdf.service';
+
+import { authenticate, validate, checkPdfOwnership, asyncHandler } from '../middleware';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { pdfService } from '../services/pdf.service';
+import { questionsService } from '../services/questions.service';
 import { NotFoundError, AuthorizationError } from '../utils/errors';
 
 const router = Router();
@@ -64,7 +60,7 @@ async function verifyPdfOwnership(pdfId: string, userId: string): Promise<void> 
     throw new NotFoundError('PDF not found');
   }
   if (pdf.userId !== userId) {
-    throw new AuthorizationError('Not authorized to access this PDF\'s questions');
+    throw new AuthorizationError("Not authorized to access this PDF's questions");
   }
 }
 
@@ -234,7 +230,9 @@ router.get(
   validate(randomQuestionsSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const userId = req.user!.sub;
-    const { pdfId, count, difficulty, excludeIds, minQualityScore } = req.query as z.infer<typeof randomQuestionsSchema>['query'];
+    const { pdfId, count, difficulty, excludeIds, minQualityScore } = req.query as z.infer<
+      typeof randomQuestionsSchema
+    >['query'];
 
     // Verify ownership
     await verifyPdfOwnership(pdfId, userId);

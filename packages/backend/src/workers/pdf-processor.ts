@@ -2,8 +2,12 @@
  * PDF Processing Worker
  * Handles async PDF processing jobs with NLP service integration
  */
-import { Worker, Job } from 'bullmq';
 import fs from 'fs';
+
+import { Worker, Job } from 'bullmq';
+
+import { PdfMetadata } from '../db/schema/pdfs';
+import { NewQuestion } from '../db/schema/questions';
 import {
   QUEUE_NAMES,
   PdfProcessingJobData,
@@ -12,10 +16,8 @@ import {
 } from '../queues/pdf-queue';
 import { pdfService } from '../services/pdf.service';
 import { questionsService } from '../services/questions.service';
-import { progressBroadcaster } from '../websocket/progress-broadcaster';
 import { logger } from '../utils/logger';
-import { PdfMetadata } from '../db/schema/pdfs';
-import { NewQuestion } from '../db/schema/questions';
+import { progressBroadcaster } from '../websocket/progress-broadcaster';
 
 /**
  * NLP Service configuration
@@ -28,35 +30,50 @@ const NLP_SERVICE_TIMEOUT = parseInt(process.env.NLP_SERVICE_TIMEOUT || '300000'
  */
 interface NlpExtractionResponse {
   success: boolean;
-  page_count: number;
-  text_length: number;
-  metadata: {
+  page_count?: number;
+  pageCount?: number;
+  text_length?: number;
+  wordCount?: number;
+  text?: string;
+  extracted_text?: string;
+  metadata?: {
     title?: string;
     author?: string;
     subject?: string;
     keywords?: string[];
+    pageCount?: number;
+    wordCount?: number;
   };
-  extracted_text: string;
+}
+
+/**
+ * NLP question option (app module format)
+ */
+interface NlpQuestionOption {
+  id: string;
+  text: string;
 }
 
 /**
  * NLP question generation response
  */
 interface NlpQuestionResponse {
-  success: boolean;
+  success?: boolean;
   questions: Array<{
-    question_text: string;
-    options: {
-      A: string;
-      B: string;
-      C: string;
-      D: string;
-    };
-    correct_option: string;
+    // snake_case format (root main.py)
+    question_text?: string;
+    options?: { A: string; B: string; C: string; D: string } | NlpQuestionOption[];
+    correct_option?: string;
+    quality_score?: number;
+    page_reference?: number;
+    // camelCase format (app module)
+    questionText?: string;
+    correctAnswer?: string;
+    qualityScore?: number;
+    validationPassed?: boolean;
+    // common fields
     explanation: string;
     difficulty: 'easy' | 'medium' | 'hard';
-    page_reference?: number;
-    quality_score: number;
   }>;
 }
 
@@ -92,7 +109,7 @@ async function extractPdfText(filePath: string): Promise<NlpExtractionResponse> 
     const formData = new FormData();
     formData.append('file', blob, fileName);
 
-    const response = await fetch(`${NLP_SERVICE_URL}/api/v1/extract`, {
+    const response = await fetch(`${NLP_SERVICE_URL}/api/v1/pdf/extract`, {
       method: 'POST',
       body: formData,
       signal: controller.signal,
@@ -109,7 +126,6 @@ async function extractPdfText(filePath: string): Promise<NlpExtractionResponse> 
   }
 }
 
-
 /**
  * Generate questions from extracted text
  */
@@ -124,7 +140,7 @@ async function generateQuestions(
   const timeout = setTimeout(() => controller.abort(), NLP_SERVICE_TIMEOUT);
 
   try {
-    const response = await fetch(`${NLP_SERVICE_URL}/api/v1/generate-questions`, {
+    const response = await fetch(`${NLP_SERVICE_URL}/api/v1/questions/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -185,6 +201,20 @@ async function processPdfJob(
       throw new Error('PDF extraction returned unsuccessful response');
     }
 
+    // Get extracted text from either format
+    const extractedText = extraction.extracted_text || extraction.text || '';
+    const pageCount =
+      extraction.page_count || extraction.pageCount || extraction.metadata?.pageCount || 0;
+    const textLength =
+      extraction.text_length ||
+      extraction.wordCount ||
+      extraction.metadata?.wordCount ||
+      extractedText.length;
+
+    if (!extractedText || extractedText.length < 100) {
+      throw new Error('Insufficient text extracted from PDF');
+    }
+
     // Stage 3: Generate questions
     await updateProgress(job, {
       stage: 'generating',
@@ -194,9 +224,9 @@ async function processPdfJob(
       totalSteps: 5,
     });
 
-    const questionResult = await generateQuestions(extraction.extracted_text);
+    const questionResult = await generateQuestions(extractedText);
 
-    if (!questionResult.success || !questionResult.questions.length) {
+    if (!questionResult.questions || !questionResult.questions.length) {
       throw new Error('No questions could be generated from the PDF');
     }
 
@@ -209,18 +239,37 @@ async function processPdfJob(
       totalSteps: 5,
     });
 
-    // Convert to database format
-    const questionsToSave: NewQuestion[] = questionResult.questions.map((q) => ({
-      pdfId,
-      questionText: q.question_text,
-      options: q.options,
-      correctOption: q.correct_option,
-      explanation: q.explanation,
-      difficulty: q.difficulty,
-      pageReference: q.page_reference,
-      qualityScore: q.quality_score.toString(),
-      validationStatus: 'pending' as const,
-    }));
+    // Convert to database format - handle both snake_case and camelCase response formats
+    const questionsToSave: NewQuestion[] = questionResult.questions.map((q) => {
+      // Handle options format - can be object {A, B, C, D} or array [{id, text}]
+      let optionsObj: { A: string; B: string; C: string; D: string };
+      if (Array.isArray(q.options)) {
+        // App module format: [{id: "A", text: "..."}, ...]
+        optionsObj = { A: '', B: '', C: '', D: '' };
+        for (const opt of q.options) {
+          if (opt.id && opt.text) {
+            optionsObj[opt.id as keyof typeof optionsObj] = opt.text;
+          }
+        }
+      } else if (q.options) {
+        // Root main.py format: {A: "...", B: "...", ...}
+        optionsObj = q.options as { A: string; B: string; C: string; D: string };
+      } else {
+        optionsObj = { A: '', B: '', C: '', D: '' };
+      }
+
+      return {
+        pdfId,
+        questionText: q.question_text || q.questionText || '',
+        options: optionsObj,
+        correctOption: q.correct_option || q.correctAnswer || 'A',
+        explanation: q.explanation || '',
+        difficulty: q.difficulty,
+        pageReference: q.page_reference,
+        qualityScore: String(q.quality_score ?? q.qualityScore ?? 0.5),
+        validationStatus: 'pending' as const,
+      };
+    });
 
     // Stage 5: Save questions to database
     await updateProgress(job, {
@@ -235,15 +284,15 @@ async function processPdfJob(
 
     // Update PDF with metadata and status
     const metadata: PdfMetadata = {
-      title: extraction.metadata.title,
-      author: extraction.metadata.author,
-      subject: extraction.metadata.subject,
-      keywords: extraction.metadata.keywords,
-      extractedTextLength: extraction.text_length,
+      title: extraction.metadata?.title,
+      author: extraction.metadata?.author,
+      subject: extraction.metadata?.subject,
+      keywords: extraction.metadata?.keywords,
+      extractedTextLength: textLength,
     };
 
     await pdfService.updateStatus(pdfId, 'completed', {
-      pageCount: extraction.page_count,
+      pageCount: pageCount,
       metadata,
     });
 

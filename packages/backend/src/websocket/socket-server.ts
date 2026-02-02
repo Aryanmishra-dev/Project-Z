@@ -3,12 +3,14 @@
  * Real-time communication for PDF processing progress
  */
 import { Server as HttpServer } from 'http';
-import { Server, Socket } from 'socket.io';
+
 import jwt from 'jsonwebtoken';
-import { redis } from '../config/redis';
+import { Server, Socket } from 'socket.io';
+
 import { jwtConfig } from '../config/jwt';
-import { logger } from '../utils/logger';
+import { redis } from '../config/redis';
 import { JobProgress } from '../queues/pdf-queue';
+import { logger } from '../utils/logger';
 
 /**
  * Extended socket with user data
@@ -213,11 +215,7 @@ export function getIO(): Server {
 /**
  * Broadcast progress update to user and PDF rooms
  */
-export function broadcastProgress(
-  userId: string,
-  pdfId: string,
-  progress: JobProgress
-): void {
+export function broadcastProgress(userId: string, pdfId: string, progress: JobProgress): void {
   if (!io) {
     logger.warn('Cannot broadcast: Socket.IO not initialized');
     return;
@@ -282,7 +280,7 @@ export function broadcastCompletion(
  */
 export async function getConnectedUsersCount(): Promise<number> {
   if (!io) return 0;
-  
+
   const sockets = await io.of(PROCESSING_NAMESPACE).fetchSockets();
   const uniqueUsers = new Set(sockets.map((s) => (s as unknown as AuthenticatedSocket).userId));
   return uniqueUsers.size;

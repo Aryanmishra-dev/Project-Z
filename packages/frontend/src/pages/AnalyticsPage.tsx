@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { FileText, HelpCircle, Target, Clock, CheckCircle2 } from 'lucide-react';
-import { Spinner, Badge } from '@/components/ui';
-import { 
-  StatsCard, 
-  TrendsChart, 
+
+import {
+  StatsCard,
+  TrendsChart,
   WeakAreasTable,
   StreakDisplay,
   LearningInsights,
 } from '@/components/features/analytics';
+import { Spinner, Badge } from '@/components/ui';
 import { analyticsService, TrendsData, WeakAreasData, PatternsData, StreaksData } from '@/services';
 
 export function AnalyticsPage() {
@@ -54,7 +55,14 @@ export function AnalyticsPage() {
   // Default empty data
   const dashboard = dashboardData || {
     pdfs: { total: 0, completed: 0, pending: 0, failed: 0, totalQuestions: 0 },
-    quizzes: { total: 0, completed: 0, averageScore: 0, totalQuestionsAnswered: 0, correctAnswers: 0, accuracy: 0 },
+    quizzes: {
+      total: 0,
+      completed: 0,
+      averageScore: 0,
+      totalQuestionsAnswered: 0,
+      correctAnswers: 0,
+      accuracy: 0,
+    },
     recentActivity: { lastQuizDate: null, lastUploadDate: null, quizzesThisWeek: 0 },
   };
 

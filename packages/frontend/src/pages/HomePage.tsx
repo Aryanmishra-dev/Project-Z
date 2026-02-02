@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
 import { ArrowRight, Upload, Brain, BarChart3, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui';
+import { Link } from 'react-router-dom';
+
 import { Header, Footer } from '@/components/common';
+import { Button } from '@/components/ui';
 import { ROUTES } from '@/utils/constants';
 
 const features = [
@@ -42,8 +43,8 @@ export function HomePage() {
               <span className="text-primary-200"> Smart Quizzes</span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-primary-100">
-              Upload your study materials and let AI generate personalized quizzes to
-              accelerate your learning. Perfect for students, professionals, and lifelong learners.
+              Upload your study materials and let AI generate personalized quizzes to accelerate
+              your learning. Perfect for students, professionals, and lifelong learners.
             </p>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link to={ROUTES.REGISTER}>
@@ -53,7 +54,11 @@ export function HomePage() {
                 </Button>
               </Link>
               <Link to={ROUTES.LOGIN}>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-primary-700">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-primary-700"
+                >
                   Sign In
                 </Button>
               </Link>
@@ -83,9 +88,7 @@ export function HomePage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100">
                   <feature.icon className="h-6 w-6 text-primary-600" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                  {feature.title}
-                </h3>
+                <h3 className="mt-4 text-lg font-semibold text-gray-900">{feature.title}</h3>
                 <p className="mt-2 text-sm text-gray-600">{feature.description}</p>
               </div>
             ))}

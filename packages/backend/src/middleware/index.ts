@@ -3,49 +3,21 @@
  * Exports all middleware functions
  */
 
-export { 
-  authenticate, 
-  authorize, 
-  optionalAuth,
-  type AuthenticatedRequest,
-} from './auth';
+export { authenticate, authorize, optionalAuth, type AuthenticatedRequest } from './auth';
 
-export { 
-  validate, 
+export {
+  validate,
   validateMultiple,
   type ValidationTarget,
   type ValidationOptions,
 } from './validate';
 
-export {
-  authRateLimiter,
-  apiRateLimiter,
-  loginRateLimiter,
-  strictRateLimiter,
-} from './rate-limit';
+export { authRateLimiter, apiRateLimiter, loginRateLimiter, strictRateLimiter } from './rate-limit';
 
-export {
-  errorHandler,
-  notFoundHandler,
-  asyncHandler,
-  type ErrorResponse,
-} from './error-handler';
+export { errorHandler, notFoundHandler, asyncHandler, type ErrorResponse } from './error-handler';
 
-export {
-  requestIdMiddleware,
-  getRequestIdFromRequest,
-  REQUEST_ID_HEADER,
-} from './request-id';
+export { requestIdMiddleware, getRequestIdFromRequest, REQUEST_ID_HEADER } from './request-id';
 
-export {
-  checkOwnership,
-  checkPdfOwnership,
-  checkQuizSessionOwnership,
-} from './check-ownership';
+export { checkOwnership, checkPdfOwnership, checkQuizSessionOwnership } from './check-ownership';
 
-export {
-  pdfUpload,
-  validatePdfContent,
-  sanitizeFilename,
-  validatePdfMagicBytes,
-} from './upload';
+export { pdfUpload, validatePdfContent, sanitizeFilename, validatePdfMagicBytes } from './upload';

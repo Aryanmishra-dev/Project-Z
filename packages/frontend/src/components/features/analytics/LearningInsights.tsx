@@ -1,6 +1,7 @@
+import { Clock, Brain, RefreshCw, Zap, Sun, Gauge } from 'lucide-react';
+
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 import { PatternsData } from '@/services/analytics.service';
-import { Clock, Brain, RefreshCw, Zap, Sun, Gauge } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 interface LearningInsightsProps {
@@ -84,7 +85,9 @@ export function LearningInsights({ data, isLoading }: LearningInsightsProps) {
         <CardContent className="flex h-[200px] flex-col items-center justify-center gap-2">
           <Brain className="h-12 w-12 text-gray-300" />
           <p className="text-gray-500">Not enough data yet</p>
-          <p className="text-sm text-gray-400">Complete more quizzes to unlock personalized insights</p>
+          <p className="text-sm text-gray-400">
+            Complete more quizzes to unlock personalized insights
+          </p>
         </CardContent>
       </Card>
     );

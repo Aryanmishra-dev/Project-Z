@@ -3,12 +3,12 @@
  * Exports all utility functions
  */
 
-export { 
-  hashPassword, 
-  verifyPassword, 
+export {
+  hashPassword,
+  verifyPassword,
   needsRehash,
   validatePasswordStrength,
-  PASSWORD_RULES 
+  PASSWORD_RULES,
 } from './password';
 
 export {

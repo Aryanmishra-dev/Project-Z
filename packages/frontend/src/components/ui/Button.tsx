@@ -1,7 +1,8 @@
-import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
+import * as React from 'react';
+
 import { cn } from '@/utils/cn';
 
 const buttonVariants = cva(
@@ -9,13 +10,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-primary-600 text-white hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-500/25 active:bg-primary-800',
+        primary:
+          'bg-primary-600 text-white hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-500/25 active:bg-primary-800',
         secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 hover:shadow-md active:bg-gray-400',
-        outline: 'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 hover:border-primary-700 active:bg-primary-100',
+        outline:
+          'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 hover:border-primary-700 active:bg-primary-100',
         ghost: 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200',
-        destructive: 'bg-error-500 text-white hover:bg-error-600 hover:shadow-lg hover:shadow-error-500/25 active:bg-error-700',
+        destructive:
+          'bg-error-500 text-white hover:bg-error-600 hover:shadow-lg hover:shadow-error-500/25 active:bg-error-700',
         link: 'text-primary-600 underline-offset-4 hover:underline',
-        success: 'bg-success-500 text-white hover:bg-success-600 hover:shadow-lg hover:shadow-success-500/25 active:bg-success-700',
+        success:
+          'bg-success-500 text-white hover:bg-success-600 hover:shadow-lg hover:shadow-success-500/25 active:bg-success-700',
         glow: 'bg-primary-600 text-white hover:bg-primary-700 animate-glow',
       },
       size: {
@@ -33,8 +38,7 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
@@ -50,7 +54,22 @@ interface RippleStyle {
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading = false, fullWidth = false, ripple = true, disabled, children, onClick, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      loading = false,
+      fullWidth = false,
+      ripple = true,
+      disabled,
+      children,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
     const [rippleStyle, setRippleStyle] = React.useState<RippleStyle | null>(null);
     const buttonRef = React.useRef<HTMLButtonElement | null>(null);
 
@@ -62,14 +81,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           const size = Math.max(rect.width, rect.height);
           const x = event.clientX - rect.left - size / 2;
           const y = event.clientY - rect.top - size / 2;
-          
+
           setRippleStyle({ top: y, left: x, width: size, height: size });
-          
+
           // Remove ripple after animation
           setTimeout(() => setRippleStyle(null), 600);
         }
       }
-      
+
       onClick?.(event);
     };
 
@@ -93,7 +112,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </Slot>
       );
     }
-    
+
     return (
       <button
         className={cn(buttonVariants({ variant, size }), fullWidth && 'w-full', className)}
@@ -101,14 +120,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         aria-disabled={disabled || loading}
         onClick={handleClick}
+        aria-busy={loading}
         {...props}
       >
-        {loading && (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-        )}
+        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
         {children}
         {loading && <span className="sr-only">Loading</span>}
-        
+
         {/* Ripple effect */}
         {rippleStyle && (
           <span

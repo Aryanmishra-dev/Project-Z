@@ -1,8 +1,9 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, Settings, Bell } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { useAuthStore } from '@/stores/authStore';
+import { Menu, X, User, LogOut, Settings, Bell } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+
 import { Button } from '@/components/ui';
+import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils/cn';
 import { ROUTES } from '@/utils/constants';
 
@@ -44,9 +45,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
             <span className="text-lg font-bold text-white">Q</span>
           </div>
-          <span className="hidden text-xl font-bold text-gray-900 sm:block">
-            QuizGenius
-          </span>
+          <span className="hidden text-xl font-bold text-gray-900 sm:block">QuizGenius</span>
         </Link>
 
         {/* Spacer */}
@@ -89,9 +88,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
                     sideOffset={8}
                   >
                     <div className="px-3 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">
-                        {user?.fullName}
-                      </p>
+                      <p className="text-sm font-medium text-gray-900">{user?.fullName}</p>
                       <p className="text-xs text-gray-500">{user?.email}</p>
                     </div>
 

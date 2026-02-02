@@ -2,11 +2,13 @@
  * File upload middleware using Multer
  * Handles PDF uploads with security validations
  */
-import multer, { FileFilterCallback } from 'multer';
-import { Request, Response, NextFunction } from 'express';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+
+import { Request, Response, NextFunction } from 'express';
+import multer, { FileFilterCallback } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+
 import { AuthenticatedRequest } from './auth';
 import { ValidationError } from '../utils/errors';
 import { logger } from '../utils/logger';
@@ -31,11 +33,11 @@ const UPLOAD_BASE_DIR = process.env.UPLOAD_DIR || './uploads/pdfs';
  */
 function ensureUploadDir(userId: string): string {
   const userDir = path.join(UPLOAD_BASE_DIR, userId);
-  
+
   if (!fs.existsSync(userDir)) {
     fs.mkdirSync(userDir, { recursive: true, mode: 0o755 });
   }
-  
+
   return userDir;
 }
 
@@ -49,18 +51,18 @@ export function sanitizeFilename(filename: string): string {
     .replace(/\.\./g, '') // Remove parent directory references
     .replace(/[/\\]/g, '') // Remove path separators
     .replace(/[<>:"|?*]/g, '_'); // Replace invalid chars with underscore
-  
+
   // Ensure it ends with .pdf
   if (!sanitized.toLowerCase().endsWith('.pdf')) {
     sanitized += '.pdf';
   }
-  
+
   // Limit length
   if (sanitized.length > 200) {
     const ext = '.pdf';
     sanitized = sanitized.substring(0, 200 - ext.length) + ext;
   }
-  
+
   return sanitized;
 }
 
@@ -76,26 +78,34 @@ export function validatePdfMagicBytes(buffer: Buffer): boolean {
  * Multer storage configuration
  */
 const storage = multer.diskStorage({
-  destination: (req: Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+  destination: (
+    req: Request,
+    _file: Express.Multer.File,
+    cb: (error: Error | null, destination: string) => void
+  ) => {
     try {
       const authReq = req as AuthenticatedRequest;
       if (!authReq.user?.sub) {
         return cb(new Error('User not authenticated'), '');
       }
-      
+
       const uploadDir = ensureUploadDir(authReq.user.sub);
       cb(null, uploadDir);
     } catch (error) {
       cb(error as Error, '');
     }
   },
-  
-  filename: (_req: Request, _file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+
+  filename: (
+    _req: Request,
+    _file: Express.Multer.File,
+    cb: (error: Error | null, filename: string) => void
+  ) => {
     // Generate UUID filename to prevent conflicts and path traversal
     const uuid = uuidv4();
     const ext = '.pdf';
     const filename = `${uuid}${ext}`;
-    
+
     cb(null, filename);
   },
 });
@@ -103,22 +113,20 @@ const storage = multer.diskStorage({
 /**
  * File filter to only accept PDFs
  */
-const fileFilter = (
-  _req: Request,
-  file: Express.Multer.File,
-  cb: FileFilterCallback
-): void => {
+const fileFilter = (_req: Request, file: Express.Multer.File, cb: FileFilterCallback): void => {
   // Check MIME type
   if (file.mimetype !== 'application/pdf') {
     logger.warn('Upload rejected: Invalid MIME type', {
       mimetype: file.mimetype,
       filename: file.originalname,
     });
-    return cb(new ValidationError('Only PDF files are allowed', {
-      file: ['File must be a PDF (application/pdf)'],
-    }));
+    return cb(
+      new ValidationError('Only PDF files are allowed', {
+        file: ['File must be a PDF (application/pdf)'],
+      })
+    );
   }
-  
+
   // Check extension
   const ext = path.extname(file.originalname).toLowerCase();
   if (ext !== '.pdf') {
@@ -126,11 +134,13 @@ const fileFilter = (
       extension: ext,
       filename: file.originalname,
     });
-    return cb(new ValidationError('Only PDF files are allowed', {
-      file: ['File must have .pdf extension'],
-    }));
+    return cb(
+      new ValidationError('Only PDF files are allowed', {
+        file: ['File must have .pdf extension'],
+      })
+    );
   }
-  
+
   cb(null, true);
 };
 
@@ -172,11 +182,11 @@ export async function validatePdfContent(
     if (!validatePdfMagicBytes(buffer)) {
       // Delete the invalid file
       fs.unlinkSync(req.file.path);
-      
+
       logger.warn('Upload rejected: Invalid PDF magic bytes', {
         filename: req.file.originalname,
       });
-      
+
       throw new ValidationError('Invalid PDF file', {
         file: ['File does not appear to be a valid PDF'],
       });

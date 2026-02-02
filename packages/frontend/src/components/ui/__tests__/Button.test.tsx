@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
 import { Button } from '../Button';
 
 describe('Button', () => {
@@ -30,16 +31,16 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('bg-primary-600');
 
     rerender(<Button variant="secondary">Secondary</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-gray-100');
+    expect(screen.getByRole('button')).toHaveClass('bg-gray-200');
 
     rerender(<Button variant="outline">Outline</Button>);
-    expect(screen.getByRole('button')).toHaveClass('border-gray-300');
+    expect(screen.getByRole('button')).toHaveClass('border-primary-600');
 
     rerender(<Button variant="ghost">Ghost</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-transparent');
+    expect(screen.getByRole('button')).toHaveClass('text-gray-700');
 
     rerender(<Button variant="destructive">Destructive</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-error-600');
+    expect(screen.getByRole('button')).toHaveClass('bg-error-500');
   });
 
   it('applies size styles', () => {
